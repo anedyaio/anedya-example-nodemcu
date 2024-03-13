@@ -5,9 +5,10 @@ This Arduino sketch allows you to connect your device to a WiFi network and send
 > [!WARNING]
 > This code is for hobbyists for learning purposes. Not recommended for production use!!
 
-## Set-Up
 
-### [Dashboard Set-Up](https://docs.anedya.io/getting-started/quickstart/#create-a-new-project)
+## Set-Up Project in Anedya Dashboard
+ 
+Following steps ouline the overall steps to setup a project. You can read more about the steps [here](https://docs.anedya.io/getting-started/quickstart/#create-a-new-project)
 
   1. Create account and login
   2. Create new project.
@@ -15,12 +16,12 @@ This Arduino sketch allows you to connect your device to a WiFi network and send
   4. Create a node (e.g., for home- Room1 or study room).
 
  > [!TIP]
- > For more details, Visit [https://anedya.io/]
+ > For more details, Visit [anedya.io](https://anedya.io)
 
 > [!IMPORTANT]
  > Variable Identifier is essential; fill it accurately.
 
-### Hardware Set-Up
+## Hardware Set-Up
 
 You can run the code without any hardware sensor also,Simply keep `virtual_sensor=true` or
 
@@ -45,7 +46,7 @@ To send hardware sensor value, keep `virtual_Sensor = false`
 3. Open the Serial Monitor to view the device's output.
 4. The device will connect to the WiFi network, read temperature and humidity data from the DHT sensor, and start sending data to the Anedya.
 
-## Include library dependency
+## Dependencies
 
 ### ArduinoJson
 This repository contains the ArduinoJson library, which provides efficient JSON parsing and generation for Arduino and other embedded systems. It allows you to easily serialize and deserialize JSON data, making it ideal for IoT projects, data logging, and more.
@@ -87,5 +88,5 @@ To include the DHT library in your project:
 > For python SDK, visit  [https://github.com/anedyaio/anedya-dev-sdk-pyhton]
 
 >[!TIP]
-> Visit [Anedya.io](https://anedya.io/)
+> For more information, visit [Anedya.io](https://anedya.io/)
  
