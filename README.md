@@ -1,5 +1,7 @@
 # Room Monitoring - NodeMCU+DHT
 
+![Static Badge](https://img.shields.io/badge/anedya-documentation-blue?link=https%3A%2F%2Fdocs.anedya.io)
+
 This Arduino sketch allows you to connect your device to a WiFi network and send data to a server. It fetches the server time and sends data to the anedya.
 
 > [!WARNING]
@@ -16,7 +18,7 @@ Following steps ouline the overall steps to setup a project. You can read more a
   4. Create a node (e.g., for home- Room1 or study room).
 
  > [!TIP]
- > For more details, Visit [anedya.io](https://anedya.io)
+ > For more details, Visit anedya [documentation](https://docs.anedya.io)
 
 > [!IMPORTANT]
  > Variable Identifier is essential; fill it accurately.
@@ -77,7 +79,7 @@ The DHT library provides support for DHT sensors (DHT11, DHT21, DHT22, AM2301, A
 
 To include the DHT library in your project:
 
-1. Install the DHT library through the Arduino IDE Library Manager. | URL https://github.com/adafruit/DHT-sensor-library
+1. Install the DHT library through the Arduino IDE Library Manager. You can get the library from [here](https://github.com/adafruit/DHT-sensor-library)
 2. Go to `Sketch > Include Library > Manage Libraries...`.
 3. In the Library Manager, search for "DHT" .
 4. Click on the DHT entry in the list (DHT sensor Library by Adafruit Adafruit).
