@@ -87,8 +87,8 @@ To include the DHT library in your project:
 6. Once installed, you can include the library in your Arduino sketches by adding `#include <DHT.h>` at the top of your sketch.
 
 > [!TIP]
-> For python SDK, visit  [https://github.com/anedyaio/anedya-dev-sdk-pyhton]
+> Looking for Python SDK? Visit [PyPi](https://pypi.org/project/anedya-dev-sdk/) or [Github Repository](https://github.com/anedyaio/anedya-dev-sdk-pyhton)
 
 >[!TIP]
-> For more information, visit [Anedya.io](https://anedya.io/)
+> For more information, visit [anedya.io](https://anedya.io/)
  
