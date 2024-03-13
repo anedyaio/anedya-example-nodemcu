@@ -1,13 +1,16 @@
 # Room Monitoring - NodeMCU+DHT
+[<img src="https://img.shields.io/badge/anedya-documentation-blue?link=https%3A%2F%2Fdocs.anedya.io">](https://docs.anedya.io)
+
 
 This Arduino sketch allows you to connect your device to a WiFi network and send data to a server. It fetches the server time and sends data to the anedya.
 
 > [!WARNING]
 > This code is for hobbyists for learning purposes. Not recommended for production use!!
 
-## Set-Up
 
-### [Dashboard Set-Up](https://docs.anedya.io/getting-started/quickstart/#create-a-new-project)
+## Set-Up Project in Anedya Dashboard
+ 
+Following steps ouline the overall steps to setup a project. You can read more about the steps [here](https://docs.anedya.io/getting-started/quickstart/#create-a-new-project)
 
   1. Create account and login
   2. Create new project.
@@ -15,12 +18,12 @@ This Arduino sketch allows you to connect your device to a WiFi network and send
   4. Create a node (e.g., for home- Room1 or study room).
 
  > [!TIP]
- > For more details, Visit [https://anedya.io/]
+ > For more details, Visit anedya [documentation](https://docs.anedya.io)
 
 > [!IMPORTANT]
  > Variable Identifier is essential; fill it accurately.
 
-### Hardware Set-Up
+## Hardware Set-Up
 
 You can run the code without any hardware sensor also,Simply keep `virtual_sensor=true` or
 
@@ -45,7 +48,7 @@ To send hardware sensor value, keep `virtual_Sensor = false`
 3. Open the Serial Monitor to view the device's output.
 4. The device will connect to the WiFi network, read temperature and humidity data from the DHT sensor, and start sending data to the Anedya.
 
-## Include library dependency
+## Dependencies
 
 ### ArduinoJson
 This repository contains the ArduinoJson library, which provides efficient JSON parsing and generation for Arduino and other embedded systems. It allows you to easily serialize and deserialize JSON data, making it ideal for IoT projects, data logging, and more.
@@ -76,7 +79,7 @@ The DHT library provides support for DHT sensors (DHT11, DHT21, DHT22, AM2301, A
 
 To include the DHT library in your project:
 
-1. Install the DHT library through the Arduino IDE Library Manager. | URL https://github.com/adafruit/DHT-sensor-library
+1. Install the DHT library through the Arduino IDE Library Manager. You can get the library from [here](https://github.com/adafruit/DHT-sensor-library)
 2. Go to `Sketch > Include Library > Manage Libraries...`.
 3. In the Library Manager, search for "DHT" .
 4. Click on the DHT entry in the list (DHT sensor Library by Adafruit Adafruit).
@@ -84,8 +87,8 @@ To include the DHT library in your project:
 6. Once installed, you can include the library in your Arduino sketches by adding `#include <DHT.h>` at the top of your sketch.
 
 > [!TIP]
-> For python SDK, visit  [https://github.com/anedyaio/anedya-dev-sdk-pyhton]
+> Looking for Python SDK? Visit [PyPi](https://pypi.org/project/anedya-dev-sdk/) or [Github Repository](https://github.com/anedyaio/anedya-dev-sdk-pyhton)
 
 >[!TIP]
-> Visit [Anedya.io](https://anedya.io/)
+> For more information, visit [anedya.io](https://anedya.io/)
  
