@@ -85,7 +85,9 @@ void loop() {
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
     if (isnan(humidity) || isnan(temperature)) {
-      String deviceLogs = "Failed to read from DHT sensor!";
+      static int count = 0;
+      counter++;
+      String deviceLogs = String(counter)+"Failed to read from DHT sensor!";
       Serial.println(deviceLogs);  // Output error message to serial console
       Serial.println("Sending log to the server -");
       anedya_submitLog("", deviceLogs);  // anedya_submitLog("<--request ID-->", "<--Logs-->"); you can keep request id empty also
