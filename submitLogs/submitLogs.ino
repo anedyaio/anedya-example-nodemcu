@@ -51,7 +51,7 @@ char pass[] = "<PASSWORD>"; // Your WiFi network password
 // Function declarations
 void setDevice_time();                                        // Function to configure the NodeMCU's time with real-time from ATS (Anedya Time Services)
 void anedya_submitData(String datapoint, float sensor_data);  // Function to submit data to the Anedya server
-void anedya_submitLogs(String reqID, String Logs);            // Function to submit logs to the Anedya server
+void anedya_submitLog(String reqID, String Logs);            // Function to submit logs to the Anedya server
 
 // Create a DHT object
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -88,7 +88,7 @@ void loop() {
       String deviceLogs = "Failed to read from DHT sensor!";
       Serial.println(deviceLogs);  // Output error message to serial console
       Serial.println("Sending log to the server -");
-      anedya_submitLogs("", deviceLogs);  // anedya_submitLogs("<--request ID-->", "<--Logs-->"); you can keep request id empty also
+      anedya_submitLog("", deviceLogs);  // anedya_submitLog("<--request ID-->", "<--Logs-->"); you can keep request id empty also
       delay(10000);
       return;
     }
@@ -223,7 +223,7 @@ void anedya_submitData(String datapoint, float sensor_data) {
 
 // Function to submit data to Anedya server
 // For more info, visit [https://docs.anedya.io/devicehttpapi/logs-submit-logs/]
-void anedya_submitLogs(String reqID, String Logs) {
+void anedya_submitLog(String reqID, String Logs) {
   if (WiFi.status() == WL_CONNECTED) {  // Check if the device is connected to WiFi
     WiFiClientSecure client;            // Initialize a secure WiFi client
     HTTPClient http;                    // Initialize an HTTP client
