@@ -85,7 +85,7 @@ void loop() {
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
     if (isnan(humidity) || isnan(temperature)) {
-      static int count = 0;
+      static int counter = 0;
       counter++;
       String deviceLogs = String(counter)+"Failed to read from DHT sensor!";
       Serial.println(deviceLogs);  // Output error message to serial console
