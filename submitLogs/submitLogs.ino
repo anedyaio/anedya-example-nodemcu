@@ -35,7 +35,7 @@ bool virtual_sensor = false;
 
 String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
 String deviceID = "<PHYSICAL-DEVICE-UUID>";
-String connectionkey = "03cdf9928841ec3315d699ac9dfb224c"; // Fill your connection key, that you can get from your node description
+String connectionkey = "<CONNECTION-KEY>"; // Fill your connection key, that you can get from your node description
 
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
@@ -45,8 +45,8 @@ String connectionkey = "03cdf9928841ec3315d699ac9dfb224c"; // Fill your connecti
 float temperature; // float variable to strore the sensor data
 float humidity;    // float variable to store the sensor data
 
-char ssid[] = "Invesun_2.4GHz"; // Your WiFi network SSID
-char pass[] = "Invesun123com#"; // Your WiFi network password
+char ssid[] = "<SSID>";     // Your WiFi network SSID
+char pass[] = "<PASSWORD>"; // Your WiFi network password
 
 // Function declarations
 void setDevice_time();                                       // Function to configure the NodeMCU's time with real-time from ATS (Anedya Time Services)
