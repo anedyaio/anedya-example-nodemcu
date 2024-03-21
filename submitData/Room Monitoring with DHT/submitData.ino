@@ -16,7 +16,7 @@
                              - Connect sensor GND pin to GND.
                              - Connect sensor signal pin to D4.
 
-                  Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)         
+                  Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 
                                                                                            Dated: 12-March-2024
 
@@ -24,7 +24,7 @@
 #include <Arduino.h>
 
 // Emulate Hardware Sensor?
-bool virtual_sensor = true;
+bool virtual_sensor = false;
 
 #include <ESP8266WiFi.h>       // Ensure to include the ESP8266Wifi.h library, not the common library WiFi.h
 #include <ESP8266HTTPClient.h> // Ensure to include the ESP8266HTTPClient.h library, not the common library HTTPClient.h
@@ -83,6 +83,12 @@ void loop()
     // Read the temperature and humidity from the DHT sensor
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
+    if (isnan(humidity) || isnan(temperature))
+    {
+      Serial.println("Failed to read from DHT !");       // Output error message to serial console
+      delay(10000);
+      return;
+    }
   }
   else
   {
@@ -92,13 +98,13 @@ void loop()
   }
 
   Serial.print("Temperature : ");
-  Serial.print(temperature);
-  Serial.print(" Humidity : ");
-  Serial.println(humidity);
-
+  Serial.println(temperature);
   // Submit sensor data to Anedya server
   anedya_submitData("temperature", temperature); // submit data to the Anedya
-  anedya_submitData("humidity", humidity);       // submit data to the Anedya
+
+  Serial.print("Humidity : ");
+  Serial.println(humidity);
+  anedya_submitData("humidity", humidity); // submit data to the Anedya
 
   delay(15000);
 }
@@ -115,7 +121,7 @@ void setDevice_time()
   int timeCheck = 1; // Iteration control
   while (timeCheck)
   {
-    uint64_t deviceSendTime = millis(); // Get the current device running time
+    long long deviceSendTime = millis(); // Get the current device running time
 
     // Prepare the request payload
     StaticJsonDocument<200> requestPayload;
@@ -142,6 +148,7 @@ void setDevice_time()
     else if (httpResponseCode == 200)
     {
       timeCheck = 0;
+      Serial.println("synchronized!");
     }
 
     // Parse the JSON response
@@ -149,13 +156,13 @@ void setDevice_time()
     deserializeJson(jsonResponse, http.getString()); // Extract the JSON response
 
     // Extract the server time from the response
-    int64_t serverReceiveTime = jsonResponse["serverReceiveTime"];
-    int64_t serverSendTime = jsonResponse["serverSendTime"];
+    long long serverReceiveTime = jsonResponse["serverReceiveTime"];
+    long long serverSendTime = jsonResponse["serverSendTime"];
 
     // Compute the current time
-    int64_t deviceRecTime = millis();
-    int64_t currentTime = (serverReceiveTime + serverSendTime + deviceRecTime - deviceSendTime) / 2;
-    int64_t currentTimeSeconds = currentTime / 1000;
+    long long deviceRecTime = millis();
+    long long currentTime = (serverReceiveTime + serverSendTime + deviceRecTime - deviceSendTime) / 2;
+    long long currentTimeSeconds = currentTime / 1000;
 
     // Set device time
     setTime(currentTimeSeconds);
@@ -176,8 +183,8 @@ void anedya_submitData(String datapoint, float sensor_data)
     String senddata_url = "https://device." + regionCode + ".anedya.io/v1/submitData";
 
     // Get current time and convert it to milliseconds
-    uint64_t current_time = now();                     // Get the current time from the device
-    uint64_t current_time_milli = current_time * 1000; // Convert current time to milliseconds
+    long long current_time = now();                     // Get the current time from the device
+    long long current_time_milli = current_time * 1000; // Convert current time to milliseconds
 
     // Prepare data payload in JSON format
     http.begin(client, senddata_url);                   // Initialize the HTTP client with the Anedya server URL
@@ -196,7 +203,20 @@ void anedya_submitData(String datapoint, float sensor_data)
     if (httpResponseCode > 0)
     {                                     // Successful response
       String response = http.getString(); // Get the response from the server
-      Serial.println(response);           // Print the response
+      // Parse the JSON response
+      DynamicJsonDocument jsonSubmit_response(200);
+      deserializeJson(jsonSubmit_response, response); // Extract the JSON response
+                                                      // Extract the server time from the response
+      int errorcode = jsonSubmit_response["errorcode"];
+      if (errorcode == 0)
+      { // error code  0 means data submitted successfull
+        Serial.println("Data pushed to Anedya Cloud!");
+      }
+      else
+      { // other errocode means failed to push (like: 4020- mismatch variable identifier...)
+        Serial.println("Failed to push!!");
+        Serial.println(response); // Print the response
+      }
     }
     else
     { // Error handling for failed request
