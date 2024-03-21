@@ -24,7 +24,7 @@
 #include <Arduino.h>
 
 // Emulate Hardware Sensor?
-bool virtual_sensor = false;
+bool virtual_sensor = true;
 
 #include <ESP8266WiFi.h>       // Ensure to include the ESP8266Wifi.h library, not the common library WiFi.h
 #include <ESP8266HTTPClient.h> // Ensure to include the ESP8266HTTPClient.h library, not the common library HTTPClient.h
