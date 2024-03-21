@@ -39,7 +39,7 @@ String connectionkey = "<CONNECTION-KEY>"; // Fill your connection key, that you
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
 // Define the pin connected to the DHT sensor
-#define DHT_PIN 2 // pin marked as D4 on the nodemcu
+#define DHT_PIN 5 // pin marked as D1 on the nodemcu
 float temperature;
 float humidity;
 
@@ -59,6 +59,7 @@ void setup()
 
   // Connect to WiFi network
   WiFi.begin(ssid, pass);
+  Serial.println();
   Serial.print("[SETUP] Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
   { // Wait until connected
@@ -81,6 +82,7 @@ void loop()
   if (!virtual_sensor)
   {
     // Read the temperature and humidity from the DHT sensor
+     Serial.println("Fetching data from the Physical sensor");
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
     if (isnan(humidity) || isnan(temperature))
@@ -93,6 +95,7 @@ void loop()
   else
   {
     // Generate random temperature and humidity values
+    Serial.println("Fetching data from the Virtual sensor");
     temperature = random(20, 30);
     humidity = random(60, 80);
   }
