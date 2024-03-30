@@ -1,4 +1,4 @@
-# Room Monitoring - NodeMCU+DHT (Submit-Log)
+# Room Monitoring - NodeMCU+DHT (Submit-Log) (http)
 [<img src="https://img.shields.io/badge/anedya-documentation-blue?link=https%3A%2F%2Fdocs.anedya.io">](https://docs.anedya.io)
 
 
