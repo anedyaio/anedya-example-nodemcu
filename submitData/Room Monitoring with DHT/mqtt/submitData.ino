@@ -27,8 +27,8 @@
 bool virtual_sensor = true;
 
 #include <ESP8266WiFi.h>       // Ensure to include the ESP8266Wifi.h library, not the common library WiFi.
-#include <PubSubClient.h>
-#include <WiFiClientSecure.h>
+#include <PubSubClient.h>      //Include PubSubClient library to handle mqtt
+#include <WiFiClientSecure.h>  // include WiFiClientSecure to establish secure connect .. anedya only allow secure connection
 #include <ArduinoJson.h> // Include the Arduino library to make json or abstract the value from the json
 #include <TimeLib.h>     // Include the Time library to handle time synchronization with ATS (Anedya Time Services)
 #include <DHT.h>         // Include the DHT library for humidity and temperature sensor handling
@@ -40,33 +40,17 @@ const char *connectionkey = "<CONNECTION-KEY>";  // Fill your connection key, th
 const char *ssid = "<SSID>";     // Replace with your WiFi name
 const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 
-// MQTT Broker settings
-const char *mqtt_broker = "device.ap-in-1.anedya.io";
-const char *mqtt_username = deviceID;
-const char *mqtt_password = connectionkey;
-const int mqtt_port = 8883;
-String responseTopic = "$anedya/device/" + String(deviceID) + "/response";
-String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";
-// Root CA Certificate
-// Load DigiCert Global Root G2, which is used by EMQX Public Broker: broker.emqx.io
-const char *ca_cert = R"EOF(                           
------BEGIN CERTIFICATE-----
-MIICDDCCAbOgAwIBAgITQxd3Dqj4u/74GrImxc0M4EbUvDAKBggqhkjOPQQDAjBL
-MQswCQYDVQQGEwJJTjEQMA4GA1UECBMHR3VqYXJhdDEPMA0GA1UEChMGQW5lZHlh
-MRkwFwYDVQQDExBBbmVkeWEgUm9vdCBDQSAzMB4XDTI0MDEwMTAwMDAwMFoXDTQz
-MTIzMTIzNTk1OVowSzELMAkGA1UEBhMCSU4xEDAOBgNVBAgTB0d1amFyYXQxDzAN
-BgNVBAoTBkFuZWR5YTEZMBcGA1UEAxMQQW5lZHlhIFJvb3QgQ0EgMzBZMBMGByqG
-SM49AgEGCCqGSM49AwEHA0IABKsxf0vpbjShIOIGweak0/meIYS0AmXaujinCjFk
-BFShcaf2MdMeYBPPFwz4p5I8KOCopgshSTUFRCXiiKwgYPKjdjB0MA8GA1UdEwEB
-/wQFMAMBAf8wHQYDVR0OBBYEFNz1PBRXdRsYQNVsd3eYVNdRDcH4MB8GA1UdIwQY
-MBaAFNz1PBRXdRsYQNVsd3eYVNdRDcH4MA4GA1UdDwEB/wQEAwIBhjARBgNVHSAE
-CjAIMAYGBFUdIAAwCgYIKoZIzj0EAwIDRwAwRAIgR/rWSG8+L4XtFLces0JYS7bY
-5NH1diiFk54/E5xmSaICIEYYbhvjrdR0GVLjoay6gFspiRZ7GtDDr9xF91WbsK0P
------END CERTIFICATE-----
-)EOF";
+// MQTT connection settings
+const char *mqtt_broker = "device.ap-in-1.anedya.io";  // MQTT broker address
+const char *mqtt_username = deviceID;  // MQTT username
+const char *mqtt_password = connectionkey;  // MQTT password
+const int mqtt_port = 8883;  // MQTT port
+String responseTopic = "$anedya/device/" + String(deviceID) + "/response";  // MQTT topic for device responses
+String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";  // MQTT topic for device errors
 
-long long submitTimer;
-String timeRes, submitRes;
+
+long long submitTimer;       //timer to handle request delay
+String timeRes, submitRes;   //varibale to handle response
 
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
@@ -76,15 +60,15 @@ float temperature;
 float humidity;
 
 // Function Declarations
-void connectToMQTT();
-void mqttCallback(char *topic, byte *payload, unsigned int length);
+void connectToMQTT();     // funstion to connect with the anedya broker
+void mqttCallback(char *topic, byte *payload, unsigned int length);   // funstion to handle call back 
 void setDevice_time();                                       // Function to configure the device time with real-time from ATS (Anedya Time Services)
 void anedya_submitData(String datapoint, float sensor_data); // Function to submit data to the Anedya server
 
 
 // WiFi and MQTT client initialization
-WiFiClientSecure esp_client;
-PubSubClient mqtt_client(esp_client);
+WiFiClientSecure esp_client;            
+PubSubClient mqtt_client(esp_client);   
 
 // Create a DHT object
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -108,11 +92,6 @@ void setup()
   Serial.println(WiFi.localIP());
 
   submitTimer = millis();
-  // Set Root CA certificate
-//  esp_client.setCACert(ca_cert);
-
-// Load root CA certificate into WiFiClientSecure object
-  esp_client.setTrustAnchors(new BearSSL::X509List(ca_cert));
   esp_client.setInsecure();
 
   mqtt_client.setServer(mqtt_broker, mqtt_port);
