@@ -97,12 +97,9 @@ void setup()
   mqtt_client.setServer(mqtt_broker, mqtt_port); // Set the MQTT server address and port for the MQTT client to connect to anedya broker
   mqtt_client.setKeepAlive(60);                  // Set the keep alive interval (in seconds) for the MQTT connection to maintain connectivity
   mqtt_client.setCallback(mqttCallback);         // Set the callback function to be invoked when MQTT messages are received
-  // Attempt to establish a connection to the anedya broker
-  connectToMQTT(); // Assuming this function handles the connection setup
-  // Subscribe to the MQTT topics for receiving responses and errors, converting C++ strings to C-style strings
-  mqtt_client.subscribe(responseTopic.c_str());
-  mqtt_client.subscribe(errorTopic.c_str());
-  // Set the device time, likely synchronizing it with a server or external time source
+  connectToMQTT();                               // Attempt to establish a connection to the anedya broker
+  mqtt_client.subscribe(responseTopic.c_str());  // subscribe to get response
+  mqtt_client.subscribe(errorTopic.c_str());     // subscibe to get error
 
   setDevice_time(); // function to sync the the device time
   // Initialize the DHT sensor
