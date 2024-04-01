@@ -26,12 +26,12 @@
 // Emulate Hardware Sensor?
 bool virtual_sensor = false;
 
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include <WiFiClientSecure.h>
-#include <ArduinoJson.h> // Include the Arduino library to make json or abstract the value from the json
-#include <TimeLib.h>     // Include the Time library to handle time synchronization with ATS (Anedya Time Services)
-#include <DHT.h>         // Include the DHT library for humidity and temperature sensor handling
+#include <ESP8266WiFi.h>      // Ensure to include the ESP8266Wifi.h library, not the common library WiFi.
+#include <PubSubClient.h>     //Include PubSubClient library to handle mqtt
+#include <WiFiClientSecure.h> // include WiFiClientSecure to establish secure connect .. anedya only allow secure connection
+#include <ArduinoJson.h>      // Include the Arduino library to make json or abstract the value from the json
+#include <TimeLib.h>          // Include the Time library to handle time synchronization with ATS (Anedya Time Services)
+#include <DHT.h>              // Include the DHT library for humidity and temperature sensor handling
 
 String regionCode = "ap-in-1";                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
 const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
@@ -40,16 +40,16 @@ const char *connectionkey = "<CONNECTION-KEY>";  // Fill your connection key, th
 const char *ssid = "<SSID>";     // Replace with your WiFi name
 const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 
-// MQTT Broker settings
-const char *mqtt_broker = "device.ap-in-1.anedya.io";
-const char *mqtt_username = deviceID;
-const char *mqtt_password = connectionkey;
-const int mqtt_port = 8883;
-String responseTopic = "$anedya/device/" + String(deviceID) + "/response";
-String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";
+// MQTT connection settings
+const char *mqtt_broker = "device.ap-in-1.anedya.io";                      // MQTT broker address
+const char *mqtt_username = deviceID;                                      // MQTT username
+const char *mqtt_password = connectionkey;                                 // MQTT password
+const int mqtt_port = 8883;                                                // MQTT port
+String responseTopic = "$anedya/device/" + String(deviceID) + "/response"; // MQTT topic for device responses
+String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";      // MQTT topic for device errors
 
-long long submitDataTimer, submitLogTimer;
-String timeRes, submitRes;
+long long submitDataTimer, submitLogTimer; // timer to handle request delay
+String timeRes, submitRes;                 // varibale to handle response
 
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
@@ -59,10 +59,10 @@ float temperature;
 float humidity;
 
 // Function Declarations
-void connectToMQTT();
-void mqttCallback(char *topic, byte *payload, unsigned int length);
-void setDevice_time();                                       // Function to configure the device time with real-time from ATS (Anedya Time Services)
-void anedya_submitData(String datapoint, float sensor_data); // Function to submit data to the Anedya server
+void connectToMQTT();                                               // funstion to connect with the anedya server
+void mqttCallback(char *topic, byte *payload, unsigned int length); // funstio to handle call back
+void setDevice_time();                                              // Function to configure the device time with real-time from ATS (Anedya Time Services)
+void anedya_submitData(String datapoint, float sensor_data);        // Function to submit data to the Anedya server
 void anedya_sumitLog(String reqID, String Log);
 
 // WiFi and MQTT client initialization
@@ -90,21 +90,21 @@ void setup()
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
-  
-
   submitDataTimer = millis();
   submitLogTimer = millis();
 
   esp_client.setInsecure();
-  mqtt_client.setServer(mqtt_broker, mqtt_port);
-  mqtt_client.setKeepAlive(60);
-  mqtt_client.setCallback(mqttCallback);
-  connectToMQTT();
-
+  mqtt_client.setServer(mqtt_broker, mqtt_port); // Set the MQTT server address and port for the MQTT client to connect to anedya broker
+  mqtt_client.setKeepAlive(60);                  // Set the keep alive interval (in seconds) for the MQTT connection to maintain connectivity
+  mqtt_client.setCallback(mqttCallback);         // Set the callback function to be invoked when MQTT messages are received
+  // Attempt to establish a connection to the anedya broker
+  connectToMQTT(); // Assuming this function handles the connection setup
+  // Subscribe to the MQTT topics for receiving responses and errors, converting C++ strings to C-style strings
   mqtt_client.subscribe(responseTopic.c_str());
   mqtt_client.subscribe(errorTopic.c_str());
+  // Set the device time, likely synchronizing it with a server or external time source
 
-  setDevice_time();
+  setDevice_time(); // function to sync the the device time
   // Initialize the DHT sensor
   dht.begin();
 }
