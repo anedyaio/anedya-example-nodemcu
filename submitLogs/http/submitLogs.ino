@@ -14,7 +14,7 @@
                              - Properly identify your sensor's pins.
                              - Connect sensor VCC pin to 3V3.
                              - Connect sensor GND pin to GND.
-                             - Connect sensor signal pin to D1.
+                             - Connect sensor signal pin to 5(marked D1 on the nodemcu).
 
                   Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 

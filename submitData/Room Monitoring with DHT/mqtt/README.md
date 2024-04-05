@@ -32,7 +32,7 @@ To send hardware sensor value, keep `virtual_Sensor = false`
   1. Properly identify your sensor's pins.
   2. Connect sensor VCC pin to 3V3.
   3. Connect sensor GND pin to GND.
-  4. Connect sensor signal pin to D4.
+  4. Connect sensor signal pin to 5(Marked D1 On the Nodemcu).
 
 ### Code Set-Up 
 
