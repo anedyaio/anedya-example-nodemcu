@@ -54,7 +54,9 @@ String timeRes, submitRes; // varibale to handle response
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
 // Define the pin connected to the DHT sensor
-#define DHT_PIN 5 // pin marked as D5 on the ESP32
+#define DHT_PIN 5 // pin marked as D1 on the NodeMCU board
+
+// Define the temperature and humidity variables
 float temperature;
 float humidity;
 
