@@ -11,6 +11,7 @@
                             Note: Variable Identifier is essential; fill it accurately.
 
                             # Hardware Setup
+                            - connect Led at GPIO pin 5(Marked D1 on the nodeMCU)
 
                   Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 
@@ -26,11 +27,11 @@
 #include <TimeLib.h>           // Include the Time library to handle time synchronization with ATS (Anedya Time Services)
 
 String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
-const char *deviceID = "281edd1c-ef6c-4fd3-aa32-d5b07a53f982";   // Fill your device Id , that you can get from your node description
-const char *connectionkey = "0685b02726aa96438e16e53a8e11425b";  // Fill your connection key, that you can get from your node description
+const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
+const char *connectionkey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 // WiFi credentials
-const char *ssid = "Invesun_2.4GHz";  // Replace with your WiFi name
-const char *pass = "Invesun123com#";  // Replace with your WiFi password
+const char *ssid = "<SSID>";     // Replace with your WiFi name
+const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 
 // MQTT connection settings
 const char *mqtt_broker = "device.ap-in-1.anedya.io";                       // MQTT broker address
@@ -39,15 +40,15 @@ const char *mqtt_password = connectionkey;                                  // M
 const int mqtt_port = 8883;                                                 // MQTT port
 String responseTopic = "$anedya/device/" + String(deviceID) + "/response";  // MQTT topic for device responses
 String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";       // MQTT topic for device errors
-String commandTopic = "$anedya/device/" + String(deviceID) + "/commands";
+String commandTopic = "$anedya/device/" + String(deviceID) + "/commands";   // MQTT topic for device commands
 
-String statusTopic = "$anedya/device/" + String(deviceID) + "/commands/updateStatus/json";
-String timeRes, commandId;  // varibale to handle response
-String ledStatus = "off";
-long long responseTimer = 0;
-  bool processCheck=false;
+String statusTopic = "$anedya/device/" + String(deviceID) + "/commands/updateStatus/json";  // MQTT topic update status of the command
+String timeRes, commandId;                                                                  // varibale to time response and store command Id
+String ledStatus = "off";                                                                   // variable to store the status of the led
+long long responseTimer = 0;                                                                // timer to control flow
+bool processCheck = false;                                                                  // check's, to make sure publish for process topic , once.
 
-const int ledPin = 2;  //
+const int ledPin = 5;  // Marked D1 on the nodeMCU
 
 // Function Declarations
 void connectToMQTT();                                                // function to connect with the anedya broker
@@ -74,8 +75,6 @@ void setup() {
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
-
-
   esp_client.setInsecure();
   mqtt_client.setServer(mqtt_broker, mqtt_port);  // Set the MQTT server address and port for the MQTT client to connect to anedya broker
   mqtt_client.setKeepAlive(60);                   // Set the keep alive interval (in seconds) for the MQTT connection to maintain connectivity
@@ -96,26 +95,31 @@ void loop() {
   if (!mqtt_client.connected()) {
     connectToMQTT();
   }
-  if (millis() - responseTimer > 700 && processCheck && commandId != "") {
-    String statusProcessingPayload="{\"reqId\": \"\",\"commandId\": \"" + commandId +"\",\"status\": \"processing\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-    mqtt_client.publish(statusTopic.c_str(), statusProcessingPayload.c_str());
-    Serial.println("Processing..");
-    processCheck=false;
+  if (millis() - responseTimer > 700 && processCheck && commandId != "") {                                                                                         // condition block to publish the command processing message
+    String statusProcessingPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"processing\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";  // payload
+    mqtt_client.publish(statusTopic.c_str(), statusProcessingPayload.c_str());                                                                                     // publish the command processing message
+    processCheck = false;
 
-  } else if (millis() - responseTimer >= 1000 && commandId != "") {
-
+  } else if (millis() - responseTimer >= 1000 && commandId != "") {  // condition block to publish the command success or failure message
     if (ledStatus == "on" || ledStatus == "ON") {
       // Turn the LED on (HIGH)
       digitalWrite(ledPin, HIGH);
       Serial.println("Led ON");
-    } else {
+      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+
+    } else if (ledStatus == "off" || ledStatus == "OFF") {
       // Turn the LED off (LOW)
       digitalWrite(ledPin, LOW);
       Serial.println("Led OFF");
+      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+    } else {
+      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+      Serial.println("Invalid Command");
     }
-    String statusSuccessPayload="{\"reqId\": \"\",\"commandId\": \"" + commandId +"\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-    mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
-    commandId = "";
+    commandId = "";  //checks
   }
 
   mqtt_client.loop();
@@ -148,22 +152,20 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
   String str_res(res);
   JsonDocument Response;
   deserializeJson(Response, str_res);
-  if (Response["deviceSendTime"]) {
+  if (Response["deviceSendTime"])  //block to get the device send time
+  {
     timeRes = str_res;
-  } else if (Response["command"]) {
-
-    ledStatus = String(Response["data"]);  // Get the server receive time from the JSON document
+  } else if (Response["command"])  //block to get the command
+  {
+    ledStatus = String(Response["data"]);
     responseTimer = millis();
     commandId = String(Response["id"]);
-    Serial.println(commandId);
-    String statusReceivedPayload="{\"reqId\": \"\",\"commandId\": \"" + commandId +"\",\"status\": \"received\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+    String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"received\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
     mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
-    processCheck=true;
-        Serial.println(str_res);
-
-
-    Serial.println("Response Receiving");
-  } else {
+    processCheck = true;
+  } else if (String(Response["errCode"]) == "0") {
+  } else  //block to debug errors
+  {
     Serial.println(str_res);
   }
 }
