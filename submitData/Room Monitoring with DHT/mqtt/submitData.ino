@@ -308,6 +308,7 @@ void anedya_submitData(String datapoint, float sensor_data)
           Serial.println(submitRes);
         }
         check = false;
+        submitTimer=5000;
       }
     }
     else
