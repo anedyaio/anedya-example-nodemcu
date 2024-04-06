@@ -43,10 +43,10 @@ To send hardware sensor value, keep `virtual_Sensor = false`
 
 ## Usage
 
-1. Connect your  device to a WiFi network.
-2. Upload this code to your  device.
-3. Open the Serial Monitor to view the device's output.
-4. The device will connect to the WiFi network, read temperature and humidity data from the DHT sensor, and start sending data to the Anedya.
+
+1. Upload this code to your  device.
+2. Open the Serial Monitor to view the device's output.
+3. The device will connect to the WiFi network, read temperature and humidity data from the DHT sensor, and start sending data to the Anedya.
 
 ## Dependencies
 

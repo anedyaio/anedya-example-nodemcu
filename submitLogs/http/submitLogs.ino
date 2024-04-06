@@ -14,7 +14,7 @@
                              - Properly identify your sensor's pins.
                              - Connect sensor VCC pin to 3V3.
                              - Connect sensor GND pin to GND.
-                             - Connect sensor signal pin to D4.
+                             - Connect sensor signal pin to 5(marked D1 on the nodemcu).
 
                   Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 
@@ -40,7 +40,7 @@ String connectionkey = "<CONNECTION-KEY>"; // Fill your connection key, that you
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
 // Define the pin connected to the DHT sensor
-#define DHT_PIN 2 // pin marked as D4 on the nodemcu
+#define DHT_PIN 5 // pin marked as D1 on the nodemcu
 
 float temperature; // float variable to strore the sensor data
 float humidity;    // float variable to store the sensor data
