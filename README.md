@@ -7,14 +7,15 @@
 </p>
 This repository contains example projects for the ESP8266(NodeMcu) microcontroller utilizing the Anedya APIs. Anedya is a comprehensive cloud platform that offers Platform as a Service (PaaS) for IoT applications. It covers all aspects, including device lifecycle management, data storage, alerts, and data aggregation in a single platform. Anedya simplifies the integration of IoT hardware with the server and eliminates the burden of IoT cloud infrastructure development and management.
 
-## Overview
+## List of the example included:
 
 The examples demonstrate the setup and usage of Anedya with NodeMcu. They include:
 
-- Data submission and visualization on the Anedya cloud via HTTPS.
+- Data submission and visualization on the Anedya cloud via HTTP.
 - Data submission and visualization on the Anedya cloud via MQTT.
-- Submission of device logs.
-- Device commands control.
+- Submission of device logs vis HTTP.
+- Submission of device logs vis MQTT.
+- Device commands control via MQTT.
 
 ## Getting Started
 
@@ -32,3 +33,9 @@ For detailed documentation, refer to the official documentation [here](https://d
 ## License
 
 This project is licensed under the MIT License.
+
+> [!TIP]
+> Looking for Python SDK? Visit [PyPi](https://pypi.org/project/anedya-dev-sdk/) or [Github Repository](https://github.com/anedyaio/anedya-dev-sdk-pyhton)
+
+>[!TIP]
+> For more information, visit [anedya.io](https://anedya.io/)
