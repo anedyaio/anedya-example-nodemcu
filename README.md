@@ -1,4 +1,4 @@
-# Anedya Example NodeMcu
+# Anedya-Example-NodeMcu
 
 [<img src="https://img.shields.io/badge/Anedya-Documentation-blue?link=https%3A%2F%2Fdocs.anedya.io">](https://docs.anedya.io)
 
