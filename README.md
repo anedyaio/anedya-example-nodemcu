@@ -1,20 +1,27 @@
-# Anedya Example NodeMcu
+[<img src="https://img.shields.io/badge/Anedya-Documentation-blue?style=for-the-badge">](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=nodeMcu)
 
-[<img src="https://img.shields.io/badge/Anedya-Documentation-blue?link=https%3A%2F%2Fdocs.anedya.io">](https://docs.anedya.io)
+# Anedya-Example-NodeMcu
+
 
 <p align="center">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmAlgiLhWiZb81tWYDrQ4ApVKXPyjuuN3XQMwgPJKJUhTmAVx5XOrkzZECCKgzl0i43g&usqp=CAU" alt="Logo">
+    <img src="https://cdn.anedya.io/anedya_black_banner.png" alt="Logo">
 </p>
 This repository contains example projects for the ESP8266(NodeMcu) microcontroller utilizing the Anedya APIs. Anedya is a comprehensive cloud platform that offers Platform as a Service (PaaS) for IoT applications. It covers all aspects, including device lifecycle management, data storage, alerts, and data aggregation in a single platform. Anedya simplifies the integration of IoT hardware with the server and eliminates the burden of IoT cloud infrastructure development and management.
 
-## Overview
+## Examples Included:
 
-The examples demonstrate the setup and usage of Anedya with NodeMcu. They include:
+The examples demonstrate how to utilize Anedya with NodeMcu:
 
-- Data submission and visualization on the Anedya cloud via HTTPS.
-- Data submission and visualization on the Anedya cloud via MQTT.
-- Submission of device logs.
-- Device commands control.
+- **Data Submission and Visualization via HTTP:** Submit data to the Anedya cloud and visualize it using HTTP requests. Click [here](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/submitData/Room%20Monitoring%20with%20DHT/http/README.md), for more info.
+   
+- **Data Submission and Visualization via MQTT:** Submit data to the Anedya cloud and visualize it using MQTT (Message Queuing Telemetry Transport) protocol. Click [here](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/submitData/Room%20Monitoring%20with%20DHT/mqtt/README.md), for more info.
+   
+- **Device Logs Submission via HTTP:** Submit device logs to the Anedya cloud using HTTP requests. Click [here](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/submitLogs/http/README.md), for more info.
+   
+- **Device Logs Submission via MQTT:** Submit device logs to the Anedya cloud using MQTT. click [here](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/submitLogs/mqtt/README.md), for more info.
+   
+- **Device Commands Control via MQTT:** Control your device through the anedya dashboard-commands using MQTT. Click [here](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/commands/mqtt/README.md), for more info.
+
 
 ## Getting Started
 
@@ -31,4 +38,11 @@ For detailed documentation, refer to the official documentation [here](https://d
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://github.com/anedyaio/anedya-example-nodemcu/blob/main/LICENSE).
+
+> [!TIP]
+> Looking for Python SDK? Visit [PyPi](https://pypi.org/project/anedya-dev-sdk/) or [Github Repository](https://github.com/anedyaio/anedya-dev-sdk-pyhton)
+
+>[!TIP]
+> For more information, visit [anedya.io](https://anedya.io/?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=nodeMcu)
+ 
