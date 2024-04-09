@@ -10,7 +10,7 @@
 
                  Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
                   For more info, visit- https://docs.anedya.io/valuestore/intro
-                                                                                          Dated: 9-April-2024
+                                                                                          Dated: 8-April-2024
 
 */
 #include <Arduino.h>
@@ -21,12 +21,13 @@
 #include <ArduinoJson.h> // Include the ArduinoJson library for JSON handling
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visit [https://docs.anedya.io/device/intro/#region]
+String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
 String deviceID = "<PHYSICAL-DEVICE-UUID>";
-String connectionkey = "<CONNECTION-KEY>"; // Fill your connection key, that you can get from your node description
+String connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 
-char ssid[] = "<SSID>";     // Your WiFi network SSID
-char pass[] = "<PASSWORD>"; // Your WiFi network password
+// Your WiFi credentials
+char ssid[] = "<SSID>";  // Your WiFi network SSID
+char pass[] = "<PASSWORD>";  // Your WiFi network password
 
 long long updateInterval,timer;   //varibles to insert interval
 
@@ -53,12 +54,12 @@ void setup()
 
 void loop()
 {
-      updateInterval=15000;
+      updateInterval=5000;
   if(millis()-timer>=updateInterval){
 String boardInfo = "Chip ID:" + String(ESP.getChipId(), HEX) +", "+
-                   "CPU Frequency:" + String(ESP.getCpuFreqMHz()) +", "+
+                   "CPU Frequency:" + String(ESP.getCpuFreqMHz()) +"MHz, "+
                    "Flash Size:" + String(ESP.getFlashChipSize() / (1024 * 1024)) + " MB" +", "+
-                   "Free Heap Size:" + String(ESP.getFreeHeap()) +", "+
+                   "Free Heap Size:" + String(ESP.getFreeHeap()) +" bytes, "+
                    "Sketch Size:" + String(ESP.getSketchSize() / 1024) + " KB" +", "+
                    "Free Sketch Space:" + String(ESP.getFreeSketchSpace() / 1024) + " KB" +", "+
                    "Flash Speed:" + String(ESP.getFlashChipSpeed() / 1000000) + " MHz";
@@ -71,7 +72,7 @@ String boardInfo = "Chip ID:" + String(ESP.getChipId(), HEX) +", "+
   }
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
-void anedya_setValue(String datapoint, float sensor_data)
+void anedya_setValue(String KEY, String TYPE, String VALUE)
 {
     if (WiFi.status() == WL_CONNECTED)
     {                            // Check if the device is connected to WiFi
@@ -86,10 +87,10 @@ void anedya_setValue(String datapoint, float sensor_data)
         http.addHeader("Content-Type", "application/json"); // Set the content type of the request as JSON
         http.addHeader("Accept", "application/json");       // Specify the accepted content type
         http.addHeader("Auth-mode", "key");                 // Set authentication mode
-        http.addHeader("Authorization", connectionkey);     // Add the connection key for authorization
+        http.addHeader("Authorization", connectionKey);     // Add the connection key for authorization
 
     // Construct the JSON payload
-    String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + key + "\",\"value\": \"" + value + "\",\"type\": \"" + type + "\"}";
+    String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + KEY + "\",\"value\": \"" + VALUE + "\",\"type\": \"" + TYPE + "\"}";
         // Serial.println(jsonStr);
         // Send the POST request with the JSON payload to Anedya server
         int httpResponseCode = http.POST(valueJsonStr);
@@ -105,11 +106,11 @@ void anedya_setValue(String datapoint, float sensor_data)
             int errorcode = jsonSubmit_response["errorcode"];
             if (errorcode == 0)
             { // error code  0 means data submitted successfull
-                Serial.println("Data pushed to Anedya Cloud!");
+                Serial.println("Value set!");
             }
             else
             { // other errocode means failed to push (like: 4020- mismatch variable identifier...)
-                Serial.println("Failed to push!!");
+                Serial.println("Failed to set!!");
                 Serial.println(response); // Print the response
             }
         }
