@@ -54,7 +54,7 @@ void setup()
 
 void loop()
 {
-      updateInterval=5000;
+      updateInterval=15000;
   if(millis()-timer>=updateInterval){
 String boardInfo = "Chip ID:" + String(ESP.getChipId(), HEX) +", "+
                    "CPU Frequency:" + String(ESP.getCpuFreqMHz()) +"MHz, "+
@@ -80,7 +80,6 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
         HTTPClient http;         // Initialize an HTTP client
         client.setInsecure();    // Configure the client to accept insecure connections
     String setValue_url = "https://device." + regionCode + ".anedya.io/v1/valuestore/setValue";  // Construct the URL for submitting data
-
 
         // Prepare data payload in JSON format
         http.begin(client, setValue_url);                   // Initialize the HTTP client with the Anedya server URL

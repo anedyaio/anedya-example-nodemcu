@@ -1,6 +1,6 @@
 [<img src="https://img.shields.io/badge/Anedya-Documentation-blue?style=for-the-badge">](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=nodeMcu)
 
-# Store-Device-Info - Example (http)
+# Store-Device-Info - Example (mqtt)
 
 
 This Arduino sketch allows you to set the your value to the anedya dashboard.
