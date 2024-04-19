@@ -156,11 +156,12 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     timeRes = str_res;
   } else if (Response["command"])  //block to get the command
   {
-    ledStatus = String(Response["data"]);
+
     responseTimer = millis();
-    commandId = String(Response["id"]);
+    commandId = String(Response["commandId"]);
     String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"received\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
     mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
+    ledStatus = String(Response["data"]);
     processCheck = true;
   } else if (String(Response["errCode"]) == "0") {
   } else  //block to debug errors
