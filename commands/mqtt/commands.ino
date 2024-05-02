@@ -28,15 +28,14 @@
 
 String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
 const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
-const char *connectionkey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
-// WiFi credentials
+const char *connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 const char *ssid = "<SSID>";     // Replace with your WiFi name
 const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 
 // MQTT connection settings
-const char *mqtt_broker = "device.ap-in-1.anedya.io";                       // MQTT broker address
+const char *mqtt_broker = "mqtt.ap-in-1.anedya.io";                       // MQTT broker address
 const char *mqtt_username = deviceID;                                       // MQTT username
-const char *mqtt_password = connectionkey;                                  // MQTT password
+const char *mqtt_password = connectionKey;                                  // MQTT password
 const int mqtt_port = 8883;                                                 // MQTT port
 String responseTopic = "$anedya/device/" + String(deviceID) + "/response";  // MQTT topic for device responses
 String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";       // MQTT topic for device errors
@@ -157,11 +156,12 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     timeRes = str_res;
   } else if (Response["command"])  //block to get the command
   {
-    ledStatus = String(Response["data"]);
+
     responseTimer = millis();
-    commandId = String(Response["id"]);
+    commandId = String(Response["commandId"]);
     String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"received\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
     mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
+    ledStatus = String(Response["data"]);
     processCheck = true;
   } else if (String(Response["errCode"]) == "0") {
   } else  //block to debug errors
