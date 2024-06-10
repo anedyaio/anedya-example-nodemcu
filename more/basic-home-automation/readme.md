@@ -7,7 +7,6 @@
 </p>
 This Arduino sketch allows you to remotely control your device using Anedya commands and monitor your room's humidity and temperature. By integrating this sketch with the![anedya-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example) web app or the Anedya dashboard, you can easily manage and automate your home environment.
 
-
 This project is designed for users looking to implement a basic home automation system. The Arduino sketch provided enables users to monitor key environmental parameters such as humidity and temperature, which are crucial for maintaining a comfortable living space. Additionally, the system allows for remote control of connected devices, 
 offering convenience and enhancing the overall smart home experience.
 
