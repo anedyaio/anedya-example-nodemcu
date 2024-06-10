@@ -22,7 +22,7 @@ To get started with the examples:
 
 ## Getting Started
 
-![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-10.svg) 
+![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-10%20(1).svg) 
 
 ## Usage
  
