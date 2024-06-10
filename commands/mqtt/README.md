@@ -59,6 +59,16 @@ To include the `timelib.h` library:
 5. Click the "Install" button to install the library.
 6. Once installed, you can include the library in your Arduino sketches by adding `#include <TimeLib.h>` at the top of your sketch.
 
+### PubSubClient
+This repository contains the PubSubClient library, which provides a simple interface to publish and subscribe to messages using the MQTT protocol. It is suitable for connecting Arduino devices to MQTT brokers, enabling efficient communication in IoT projects.
+
+1. Open the Arduino IDE.
+2. Go to Sketch > Include Library > Manage Libraries....
+3. In the Library Manager, search for "PubSubClient".
+4. Click on the PubSubClient entry in the list.(`PubSubClient by nick-o-larry`)
+5. Click the "Install" button to install the library.
+6. Once installed, you can include the library in your Arduino sketches by adding #include <PubSubClient.h> at the top of your sketch.
+
 
 
 > [!TIP]

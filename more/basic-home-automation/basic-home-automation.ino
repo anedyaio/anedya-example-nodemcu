@@ -32,7 +32,7 @@
 
 //-----------------------------------Variable section----------------------------------------------------------------------------------
 //-------------------------------------Controllers------------------------------------------------------------
-dhtData_submission_interval=120000 //2 min
+dhtData_submission_interval=120000 //It will submit the data the interval of 2 min
 
 //-------------------------------Anedya Setup------------------------------------------------------------------
 String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
