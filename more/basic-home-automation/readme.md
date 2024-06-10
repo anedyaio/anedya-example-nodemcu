@@ -32,7 +32,7 @@ To get started with the examples:
 
 
 1. Clone the Repository:
-Clone [aneday-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git) repo from anedya github.
+Clone [anedya-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git) repo from anedya github.
 ```
 git clone https://github.com/anedyaio/anedya-streamlit-dashboard-example.git
 cd anedya-streamlit-dashboard-example
