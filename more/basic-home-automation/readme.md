@@ -53,7 +53,7 @@ Start the Streamlit server:
 streamlit run Home.py
 
 ```
-This will launch the dashboard in your default web browser. [About streamlit cloud hosting](https://github.com/anedyaio/anedya-streamlit-dashboard-example/blob/main/README.md#hosting-on-streamlit-cloud)
+This will launch the dashboard in your default web browser. [Host it on the streamlit cloud](https://github.com/anedyaio/anedya-streamlit-dashboard-example/blob/main/README.md#hosting-on-streamlit-cloud)
 
 ## Dependencies
 
