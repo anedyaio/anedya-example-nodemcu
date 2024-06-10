@@ -6,16 +6,10 @@
     <img src="https://cdn.anedya.io/anedya_black_banner.png" alt="Logo">
 </p>
 
-This Arduino sketch allows you to remotely control your device using Anedya commands and monitor your room's humidity and temperature. By integrating this sketch with the[anedya-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example) web app or the Anedya dashboard, you can easily manage and automate your home environment.
-
-
 This project is designed for users looking to implement a basic home automation system. The Arduino sketch provided enables users to monitor key environmental parameters such as humidity and temperature, which are crucial for maintaining a comfortable living space. Additionally, the system allows for remote control of connected devices, 
 offering convenience and enhancing the overall smart home experience.
 
-With Anedya's platform, you can send commands to your devices and receive real-time updates on your environment's conditions. The integration with the anedya-streamlit-dashboard-example web app provides a user-friendly interface for interacting with your home automation system. The Anedya dashboard further enhances this by offering advanced features and analytics to help you optimize your home automation setup.
-
-> [!NOTE]
-> Visit, [anedya-streamlit-dashboard-example]() 
+With Anedya's platform, you can send commands to your devices and receive real-time updates on your environment's conditions. The integration with the [anedya-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example) web app provides a user-friendly and customizable interface for interacting with your home automation system. The Anedya dashboard further enhances this by offering advanced features and analytics to help you optimize your home automation setup.
 
 ## Getting Started
 
@@ -27,9 +21,38 @@ To get started with the examples:
 4. Upload the code.
 
 ## Usage
+ 
+### anedya-streamlit-dashboard-example setup [Repo](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git)
 
-visit [anedya-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example) to customize controls and visualization. 
 ![Image](https://github.com/anedyaio/anedya-streamlit-dashboard-example/blob/main/docs/anedya_dashboard.png)
+
+1. Clone the Repository:
+Clone [aneday-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git) repo from anedya github.
+```
+git clone https://github.com/anedyaio/anedya-streamlit-dashboard-example.git
+cd anedya-streamlit-dashboard-example
+
+```
+2. Install Dependencies:
+To ensure the application has all the necessary libraries, you'll need to install the dependencies listed in the requirements.txt file. This file contains a list of all the packages along with their versions that the app depends on.
+Here's how to install these dependencies:
+- Open a terminal or command prompt.
+- Navigate to the directory where you cloned the repository.
+- Run the following command to install the dependencies using pip:
+```
+pip install -r requirements.txt
+```
+This command reads the `requirements.txt` file and installs all the listed packages.
+
+3. Obtain your nodeid and apikey from the Anedya dashboard. These credentials are necessary for connecting your application to the Anedya platform. Once you have these, You need to replace <PHYSICAL-DEVICE-UUID> and <CONNECTION-KEY> with your actual device ID and connection key, respectively. 
+
+4. Run the Streamlit App:
+Start the Streamlit server:
+```
+streamlit run Home.py
+
+```
+This will launch the dashboard in your default web browser.
 
 ## Dependencies
 
