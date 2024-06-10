@@ -1,22 +1,22 @@
 /*
 
-                                               Smart Room
+                                              Basic Home Automation with Anedya
                 Disclaimer: This code is for hobbyists for learning purposes. Not recommended for production use!!
 
                             # Dashboard Setup
                              - create account and login to the dashboard
                              - Create project.
-                             - Create a node (e.g., for home- Room1 or study room).
+                             - Create a node (e.g., for home:-Room1 or study room).
                              - Create variables: temperature and humidity.
                             Note: Variable Identifier is essential; fill it accurately.
 
                             # Hardware Setup
                              -Add relay for the fan at pin D5
                              -Add relay for the light at pin D0
-                             -Add relay for the buzzer at pin D6
-                             -Add dht at pin D1
+                             -Add buzzer at pin D6
+                             -Add dht sensor at pin D1
                                                           
-
+                  Note: You can control your lights and fans and visualized your data with customization, Visit[https://github.com/anedyaio/anedya-streamlit-dashboard-example]
                   Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 
                                                                                            Dated: 7-June-2024
@@ -31,22 +31,23 @@
 #include <DHT.h>              // Include the DHT library for humidity and temperature sensor handling
 
 //-----------------------------------Variable section----------------------------------------------------------------------------------
+//-------------------------------------Controllers------------------------------------------------------------
+dhtData_submission_interval=120000 //2 min
+
 //-------------------------------Anedya Setup------------------------------------------------------------------
 String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
-const char *deviceID = "PHYSICAL-DEVICE-ID";   // Fill your device Id , that you can get from your node description
-const char *connectionkey = "CONNECTION-KEY";  // Fill your connection key, that you can get from your node description
+const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
+const char *connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 //-------------------------------Wifi Setup------------------------------------------------------------------
-const char *ssid = "SSID";  // Replace with your WiFi name
-const char *pass = "PASSWORD";  // Replace with your WiFi password
+const char *ssid = "<SSID>";     // Replace with your WiFi name
+const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 //-------------------------------Pins allocation---------------------------------------------------------------
-#define fanPin   14 // pin marked as D5 on the NodeMCU board
 #define lightPin 16 // pin marked as D0 on the NodeMCU board
+#define fanPin   14 // pin marked as D5 on the NodeMCU board
 #define buzzerPin 12 // pin marked as D6 on the NodeMCU board
 #define DHT_PIN 5 // pin marked as D1 on the NodeMCU board
-// Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
-#define DHT_TYPE DHT11
-
-
+//------------------------------------------------------------------------------------------------------------
+#define DHT_TYPE DHT11 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 //---------------------------------Mqtt-variables----------------------------------------------------------------
 // MQTT connection settings
 const char *mqtt_broker = "device.ap-in-1.anedya.io";                       // MQTT broker address
@@ -60,7 +61,7 @@ String statusTopic = "$anedya/device/" + String(deviceID) + "/commands/updateSta
 
 //------------------------------------Helper variables-----------------------------------------------------------
 String timeRes,submitRes,commandId, fan_commandId, light_commandId;         
-long long submitTimer,submitLogTimer,submitDataTimer,submitTemHum_timer;                                    // timer's variable to control flow
+long long submitTimer,submitLogTimer,submitDataTimer,submitTemHum_timer;  // timer's variable to control the flow
 String fanStatus = "on";   // variable to store the status of the fan
 String lightStatus = "off";  // variable to store the status of the light
 float temperature;
@@ -69,7 +70,6 @@ float humidity;
 WiFiClientSecure esp_client;
 PubSubClient mqtt_client(esp_client);
 
-// Create a DHT object
 DHT dht(DHT_PIN, DHT_TYPE);
 
 //------------------------------------------Function Decalaration section----------------------------------------
@@ -124,7 +124,7 @@ void loop() {
   if (!mqtt_client.connected()) {
     connectToMQTT();
   }
-  if(millis()-submitTemHum_timer==5000){
+  if(millis()-submitTemHum_timer>=dhtData_submission_interval){ //
     submitTemHum_timer=millis();
     Serial.println("Fetching data from the Physical sensor");
     temperature = dht.readTemperature();
