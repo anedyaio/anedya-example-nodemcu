@@ -22,9 +22,10 @@ To get started with the examples:
 
 ## Usage
  
-### anedya-streamlit-dashboard-example setup [Repo](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git)
+### anedya-streamlit-dashboard-example setup
 
 ![Image](https://github.com/anedyaio/anedya-streamlit-dashboard-example/blob/main/docs/anedya_dashboard.png)
+
 
 1. Clone the Repository:
 Clone [aneday-streamlit-dashboard-example](https://github.com/anedyaio/anedya-streamlit-dashboard-example.git) repo from anedya github.
@@ -52,7 +53,7 @@ Start the Streamlit server:
 streamlit run Home.py
 
 ```
-This will launch the dashboard in your default web browser.
+This will launch the dashboard in your default web browser. [About streamlit cloud hosting](https://github.com/anedyaio/anedya-streamlit-dashboard-example/blob/main/README.md#hosting-on-streamlit-cloud)
 
 ## Dependencies
 
