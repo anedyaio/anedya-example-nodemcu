@@ -20,6 +20,10 @@ To get started with the examples:
 3. Select the Board and Port number.
 4. Upload the code.
 
+## Getting Started
+
+![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-10.svg)
+
 ## Usage
  
 ### anedya-streamlit-dashboard-example setup
