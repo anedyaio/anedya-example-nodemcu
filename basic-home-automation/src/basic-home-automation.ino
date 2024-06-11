@@ -16,7 +16,6 @@
                              -Add buzzer at pin D6
                              -Add dht sensor at pin D1
                                                           
-                  Note: You can control your lights and fans and visualized your data with customization, Visit[https://github.com/anedyaio/anedya-streamlit-dashboard-example]
                   Note: The code is tested on the NodeMCU 1.0 board (ESP12E-Module)
 
                                                                                            Dated: 7-June-2024
