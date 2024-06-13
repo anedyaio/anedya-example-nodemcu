@@ -31,15 +31,15 @@
 
 //-----------------------------------Variable section----------------------------------------------------------------------------------
 //-------------------------------------Controllers------------------------------------------------------------
-dhtData_submission_interval_ms=120000 //It will submit the data the interval of 2 min
+#define dhtData_submission_interval_ms 120000 //It will submit the data at the interval of 2 min
 
 //-------------------------------Anedya Setup------------------------------------------------------------------
-String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
+#define regionCode "ap-in-1"                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
 const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
 const char *connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 //-------------------------------Wifi Setup------------------------------------------------------------------
-const char *ssid = "<SSID>";     // Replace with your WiFi name
-const char *pass = "<PASSWORD>"; // Replace with your WiFi password
+const char *ssid = "SSID";     // Replace with your WiFi name
+const char *pass = "PASSWORD"; // Replace with your WiFi password
 //-------------------------------Pins allocation---------------------------------------------------------------
 #define lightPin 16 // pin marked as D0 on the NodeMCU board
 #define fanPin   14 // pin marked as D5 on the NodeMCU board
@@ -49,9 +49,10 @@ const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 #define DHT_TYPE DHT11 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 //---------------------------------Mqtt-variables----------------------------------------------------------------
 // MQTT connection settings
-const char *mqtt_broker = "mqtt.ap-in-1.anedya.io";                       // MQTT broker address
+String str_broker="mqtt."+String(regionCode)+".anedya.io";
+const char *mqtt_broker = str_broker.c_str();                       // MQTT broker address
 const char *mqtt_username = deviceID;                                       // MQTT username
-const char *mqtt_password = connectionkey;                                  // MQTT password
+const char *mqtt_password = connectionKey;                                  // MQTT password
 const int mqtt_port = 8883;                                                 // MQTT port
 String responseTopic = "$anedya/device/" + String(deviceID) + "/response";  // MQTT topic for device responses
 String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";       // MQTT topic for device errors
@@ -75,6 +76,8 @@ DHT dht(DHT_PIN, DHT_TYPE);
 void connectToMQTT();                                                // function to connect with the anedya broker
 void mqttCallback(char *topic, byte *payload, unsigned int length);  // function to handle call back
 void setDevice_time();                                              // Function to configure the device time with real-time from ATS (Anedya Time Services)
+void anedya_submitLog(String reqID, String Log);
+void anedya_updateCommand_status(String COMMAND_ID, String STATUS);
 void beep(unsigned int DELAY);                                          
 
 //-------------------------------------------------Setup-----------------------------------------------------------------------------------------------
@@ -148,19 +151,17 @@ void loop() {
       digitalWrite(fanPin, HIGH);  //turn on the fan 
       Serial.println("Fan ON");
       beep(250);
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + fan_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());  //publish the fan status
+      anedya_updateCommand_status(fan_commandId, "success");
       anedya_submitLog("", "Fan ON");
     } else if (fanStatus == "off" || fanStatus == "OFF") {
       digitalWrite(fanPin, LOW);
       Serial.println("Fan OFF");
       beep(250);
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + fan_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+      anedya_updateCommand_status(fan_commandId, "success");
       anedya_submitLog("", "Fan OFF");
     } else {
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + fan_commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+
+      anedya_updateCommand_status(fan_commandId, "failure");
       Serial.println("Invalid Command");
     }
     fan_commandId = "";  // checks
@@ -172,19 +173,17 @@ if (light_commandId != "") {  // condition block to publish the command success 
       digitalWrite(lightPin, HIGH);
       beep(250);
       Serial.println("light ON");
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + light_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+
+      anedya_updateCommand_status(light_commandId, "success");
       anedya_submitLog("", "light ON");
     } else if (lightStatus == "off" || lightStatus == "OFF") {
       digitalWrite(lightPin, LOW);
       Serial.println("light OFF");
       beep(250);
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + light_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+      anedya_updateCommand_status(light_commandId, "success");
       anedya_submitLog("", "light OFF");
     } else {
-      String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + light_commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
+      anedya_updateCommand_status(light_commandId, "failure");
       Serial.println("Invalid Command");
       anedya_submitLog("", "Invalid Command");   //submit log in the case of the unknown or invalid command
     }
@@ -230,8 +229,8 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
   {
     commandId = String(Response["commandId"]);
     String equipment = Response["command"].as<String>();
-    String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"received\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-    mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
+    anedya_updateCommand_status(commandId, "received");
+    anedya_submitLog("", "command received");
     if (equipment == "fan" or equipment == "Fan") {
       fanStatus = String(Response["data"]);
       fan_commandId = String(Response["commandId"]);
@@ -239,8 +238,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
       lightStatus = String(Response["data"]);
       light_commandId = String(Response["commandId"]);
     } else {
-      String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-      mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
+      anedya_updateCommand_status(commandId, "failure");
       anedya_submitLog("","unknown command!!");
       beep(3000);
     }
@@ -427,5 +425,10 @@ void beep(unsigned int DELAY){
   delay(DELAY);
   digitalWrite(buzzerPin,LOW);
 }
+//-------------------------------------------------update_command_status--------------------------------------------------
 
-
+void anedya_updateCommand_status(String COMMAND_ID, String STATUS)
+{
+  String statusPayload = "{\"reqId\": \"\",\"commandId\": \"" + COMMAND_ID + "\",\"status\": \"" + STATUS + "\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+  mqtt_client.publish(statusTopic.c_str(), statusPayload.c_str());
+}
