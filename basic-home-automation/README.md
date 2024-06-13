@@ -22,7 +22,7 @@ To get started with the examples:
 
 ## Circuit-Diagram
 
-![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-13.svg)
+![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-13%20(1).svg)
 
 ## Usage
  
