@@ -18,11 +18,7 @@ To get started with the examples:
 1. Choose the code, create the .ino file, and open it in the Arduino IDE.
 2. Fill in your Wi-Fi credentials, physical device ID, and connection key (obtained from the dashboard).
 3. Select the Board and Port number.
-4. Upload the code.
-
-## Circuit-diagram
-
-![circuit-diagram](./circuit-diagram/Schematic_basic-home-automation_2024-06-10%20(1).svg) 
+4. Upload the code. 
 
 ## Usage
  

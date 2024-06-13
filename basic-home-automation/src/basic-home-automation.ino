@@ -31,7 +31,7 @@
 
 //-----------------------------------Variable section----------------------------------------------------------------------------------
 //-------------------------------------Controllers------------------------------------------------------------
-dhtData_submission_interval=120000 //It will submit the data the interval of 2 min
+dhtData_submission_interval_ms=120000 //It will submit the data the interval of 2 min
 
 //-------------------------------Anedya Setup------------------------------------------------------------------
 String regionCode = "ap-in-1";                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
@@ -49,7 +49,7 @@ const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 #define DHT_TYPE DHT11 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 //---------------------------------Mqtt-variables----------------------------------------------------------------
 // MQTT connection settings
-const char *mqtt_broker = "device.ap-in-1.anedya.io";                       // MQTT broker address
+const char *mqtt_broker = "mqtt.ap-in-1.anedya.io";                       // MQTT broker address
 const char *mqtt_username = deviceID;                                       // MQTT username
 const char *mqtt_password = connectionkey;                                  // MQTT password
 const int mqtt_port = 8883;                                                 // MQTT port
@@ -83,7 +83,7 @@ void setup() {
   delay(1500);           // Delay for 1.5 seconds
 
   // Connect to WiFi network
-    WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   Serial.println();
   Serial.print("Connecting to WiFi...");
@@ -123,7 +123,7 @@ void loop() {
   if (!mqtt_client.connected()) {
     connectToMQTT();
   }
-  if(millis()-submitTemHum_timer>=dhtData_submission_interval){ //
+  if(millis()-submitTemHum_timer>=dhtData_submission_interval_ms){ //
     submitTemHum_timer=millis();
     Serial.println("Fetching data from the Physical sensor");
     temperature = dht.readTemperature();
@@ -154,7 +154,7 @@ void loop() {
     } else if (fanStatus == "off" || fanStatus == "OFF") {
       digitalWrite(fanPin, LOW);
       Serial.println("Fan OFF");
-       beep(250);
+      beep(250);
       String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + fan_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
       mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
       anedya_submitLog("", "Fan OFF");
@@ -170,7 +170,7 @@ void loop() {
 if (light_commandId != "") {  // condition block to publish the command success or failure message
     if (lightStatus == "on" || lightStatus == "ON") {
       digitalWrite(lightPin, HIGH);
-       beep(250);
+      beep(250);
       Serial.println("light ON");
       String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + light_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
       mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
@@ -178,7 +178,7 @@ if (light_commandId != "") {  // condition block to publish the command success 
     } else if (lightStatus == "off" || lightStatus == "OFF") {
       digitalWrite(lightPin, LOW);
       Serial.println("light OFF");
-       beep(250);
+      beep(250);
       String statusSuccessPayload = "{\"reqId\": \"\",\"commandId\": \"" + light_commandId + "\",\"status\": \"success\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
       mqtt_client.publish(statusTopic.c_str(), statusSuccessPayload.c_str());
       anedya_submitLog("", "light OFF");
@@ -238,11 +238,11 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
     } else if (equipment == "light" or equipment == "Light") {
       lightStatus = String(Response["data"]);
       light_commandId = String(Response["commandId"]);
-    }else{
-          String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
-    mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
-    anedya_submitLog("","unknown command!!");
-    beep(3000);
+    } else {
+      String statusReceivedPayload = "{\"reqId\": \"\",\"commandId\": \"" + commandId + "\",\"status\": \"failure\",\"ackdata\": \"\",\"ackdatatype\": \"\"}";
+      mqtt_client.publish(statusTopic.c_str(), statusReceivedPayload.c_str());
+      anedya_submitLog("","unknown command!!");
+      beep(3000);
     }
   } else if (String(Response["errCode"]) == "0") {
     submitRes = str_res;
