@@ -34,7 +34,7 @@
 #define dhtData_submission_interval_ms 120000 //It will submit the data at the interval of 2 min
 
 //-------------------------------Anedya Setup------------------------------------------------------------------
-#define regionCode "ap-in-1"                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
+#define regionCode "ap-in-1"                                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
 const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
 const char *connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 //-------------------------------Wifi Setup------------------------------------------------------------------
@@ -252,7 +252,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length) {
 
 //------------------------------------------------------------------Time synchronization function---------------------------
 // Function to configure time synchronization  with Anedya server
-// For more info, visit [https://docs.anedya.io/devicehttpapi/http-time-sync/]
+// For more info, visit [https://docs.anedya.io/device/api/http-time-sync/]
 void setDevice_time() {
   String timeTopic = "$anedya/device/" + String(deviceID) + "/time/json";  // time topic wil provide the current time from the anedya server
   const char *mqtt_topic = timeTopic.c_str();
