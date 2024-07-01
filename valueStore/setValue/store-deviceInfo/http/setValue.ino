@@ -21,7 +21,7 @@
 #include <ArduinoJson.h> // Include the ArduinoJson library for JSON handling
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
+String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
 String deviceID = "<PHYSICAL-DEVICE-UUID>";
 String connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 

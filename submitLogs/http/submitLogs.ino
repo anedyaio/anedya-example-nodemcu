@@ -33,7 +33,7 @@ bool virtual_sensor = false;
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 #include <DHT.h>         // Include the DHT library for humidity and temperature sensor handling
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
+String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
 String deviceID = "<PHYSICAL-DEVICE-UUID>";
 String connectionkey = "<CONNECTION-KEY>"; // Fill your connection key, that you can get from your node description
 
@@ -120,7 +120,7 @@ void loop()
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
 // Function to configure time synchronization with Anedya server
-// For more info, visit [https://docs.anedya.io/devicehttpapi/http-time-sync/]
+// For more info, visit [https://docs.anedya.io/device/api/http-time-sync/]
 void setDevice_time()
 {
   // URL to fetch real-time from Anedya server
