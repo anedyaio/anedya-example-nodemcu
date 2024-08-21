@@ -42,7 +42,8 @@ String valueRes;  //variable to store the response
 
 void connectToMQTT();
 void mqttCallback(char *topic, byte *payload, unsigned int length);
-void anedya_setValue(String KEY, String TYPE, String VALUE);
+void anedya_setStrValue(String KEY, String VALUE);
+void anedya_setBoolValue(String KEY, boolean VALUE);
 
 
 // WiFi and MQTT client initialization
@@ -94,11 +95,10 @@ void loop()
                    "Free Sketch Space:" + String(ESP.getFreeSketchSpace() / 1024) + " KB" +", "+
                    "Flash Speed:" + String(ESP.getFlashChipSpeed() / 1000000) + " MHz";
 
-  anedya_setValue("009", "string", boardInfo); /* anedya_setValue("<-KEY->","<-dataType->","<-VALUE->")
-                                                 1 parameter- key, 
-                                                 2 parameter- The value can hold any of the following types of data: string, binary, float, boolean
-                                                 3 parameter- value.  For detailed info, visit-https://docs.anedya.io/valuestore/intro/        */
-
+  anedya_setStrValue("009", boardInfo); /* anedya_setStrValue("<-KEY->","<-VALUE->")
+                                                 1 parameter- key,                                                  
+                                                 2 parameter- value.  For detailed info, visit-https://docs.anedya.io/valuestore/intro/        */
+  anedya_setBoolValue("bool value", true); /* anedya_setBoolValue("<-KEY->","<-VALUE->")
 
    timer=millis();      
   }
@@ -141,7 +141,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
      Serial.println(valueRes);
 }
 
-void anedya_setValue(String KEY, String TYPE, String VALUE)
+void anedya_setStrValue(String KEY, String VALUE)
 {
   boolean check = true;
   String strSetTopic = "$anedya/device/" + String(deviceID) + "/valuestore/setValue/json";
@@ -153,7 +153,7 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
       if (millis() - setValueTimer >= 2000)
       {
         setValueTimer = millis();
-       String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + KEY + "\",\"value\": \"" + VALUE + "\",\"type\": \"" + TYPE + "\"}";
+       String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + KEY + "\",\"value\": \"" + VALUE + "\",\"type\": \"string\"}";
         const char *setValuePayload = valueJsonStr.c_str();
       mqtt_client.publish(setTopic, setValuePayload);
       }
@@ -185,3 +185,48 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
   }
 }
 
+
+void anedya_setBoolValue(String KEY, boolean VALUE)
+{
+  boolean check = true;
+  String strSetTopic = "$anedya/device/" + String(deviceID) + "/valuestore/setValue/json";
+  const char *setTopic = strSetTopic.c_str();
+  while (check)
+  {
+    if (mqtt_client.connected())
+    {
+      if (millis() - setValueTimer >= 2000)
+      {
+        setValueTimer = millis();
+        String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + KEY + "\",\"value\": " + (VALUE ? "true" : "false") + ",\"type\": \"boolean\"}";
+        const char *setValuePayload = valueJsonStr.c_str();
+        mqtt_client.publish(setTopic, setValuePayload);
+      }
+      mqtt_client.loop();
+      if (valueRes != "")
+      {
+        // Parse the JSON response
+        DynamicJsonDocument jsonResponse(100);   // Declare a JSON document with a capacity of 200 bytes
+        deserializeJson(jsonResponse, valueRes); // Deserialize the JSON response from the server into the JSON document
+        int errorCode = jsonResponse["errCode"]; // Get the server receive time from the JSON document
+        if (errorCode == 0)
+        {
+          Serial.println("value set!!");
+        }
+        else
+        {
+          Serial.println("Failed to set value!");
+          Serial.println(valueRes);
+        }
+        check = false;
+        setValueTimer = 5000;
+        valueRes = "";
+        submitRes = "";
+      }
+    }
+    else
+    {
+      connectToMQTT();
+    } // mqtt connect check end
+  }
+}
