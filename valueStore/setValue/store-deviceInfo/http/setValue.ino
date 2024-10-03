@@ -21,13 +21,13 @@
 #include <ArduinoJson.h> // Include the ArduinoJson library for JSON handling
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
-String PHYSICAL_DEVICE_ID = "<PHYSICAL-DEVICE-UUID>";
-String CONNECTION_KEY = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
+// ----------------------------- Anedya and Wifi credentials --------------------------------------------
+String REGION_CODE = "ap-in-1";                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
+const char *CONNECTION_KEY = "";  // Fill your connection key, that you can get from your node description
+const char *PHYSICAL_DEVICE_ID = ""; // Fill your device Id , that you can get from your node description
+const char *SSID = "";     
+const char *PASSWORD = ""; 
 
-// Your WiFi credentials
-char ssid[] = "<SSID>";  // Your WiFi network SSID
-char pass[] = "<PASSWORD>";  // Your WiFi network password
 
 long long updateInterval,timer, lastSubmittedHeartbeat_timestamp;   //varibles to insert interval
 
@@ -39,7 +39,7 @@ void setup()
     Serial.begin(115200); // Set the baud rate for serial communication
 
     // Connect to WiFi network
-    WiFi.begin(ssid, pass);
+    WiFi.begin(SSID, PASSWORD);
     Serial.println();
     Serial.print("[SETUP] Connecting to WiFi");
     while (WiFi.status() != WL_CONNECTED)
@@ -86,7 +86,7 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
         WiFiClientSecure client; // Initialize a secure WiFi client
         HTTPClient http;         // Initialize an HTTP client
         client.setInsecure();    // Configure the client to accept insecure connections
-    String setValue_url = "https://device." + regionCode + ".anedya.io/v1/valuestore/setValue";  // Construct the URL for submitting data
+    String setValue_url = "https://device." + REGION_CODE + ".anedya.io/v1/valuestore/setValue";  // Construct the URL for submitting data
 
         // Prepare data payload in JSON format
         http.begin(client, setValue_url);                   // Initialize the HTTP client with the Anedya server URL
@@ -141,7 +141,7 @@ void anedya_sendHeartbeat()
     WiFiClientSecure client; // Initialize a secure WiFi client
     HTTPClient http;         // Initialize an HTTP client
     client.setInsecure();    // Configure the client to accept insecure connections                                                                  // Creating an instance of HTTPClient
-    String heartbeat_url = "https://device." + regionCode + ".anedya.io/v1/heartbeat"; // Constructing the URL for submitting data
+    String heartbeat_url = "https://device." + REGION_CODE + ".anedya.io/v1/heartbeat"; // Constructing the URL for submitting data
 
     // Preparing data payload in JSON format
     http.begin( client,heartbeat_url);                           // Beginning an HTTP request to the specified URL

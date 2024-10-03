@@ -33,9 +33,12 @@ bool virtual_sensor = false;
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 #include <DHT.h>         // Include the DHT library for humidity and temperature sensor handling
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
-String PHYSICAL_DEVICE_ID = "<PHYSICAL-DEVICE-UUID>";
-String CONNECTION_KEY = "<CONNECTION-KEY>"; // Fill your connection key, that you can get from your node description
+// ----------------------------- Anedya and Wifi credentials --------------------------------------------
+String REGION_CODE = "ap-in-1";                                          // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
+const char *CONNECTION_KEY = "";         // Fill your connection key, that you can get from your node description
+const char *PHYSICAL_DEVICE_ID = ""; // Fill your device Id , that you can get from your node description
+const char *SSID = "";
+const char *PASSWORD = "";
 
 // Define the type of DHT sensor (DHT11, DHT21, DHT22, AM2301, AM2302, AM2321)
 #define DHT_TYPE DHT11
@@ -45,13 +48,10 @@ String CONNECTION_KEY = "<CONNECTION-KEY>"; // Fill your connection key, that yo
 float temperature; // float variable to strore the sensor data
 float humidity;    // float variable to store the sensor data
 
-char ssid[] = "<SSID>";     // Your WiFi network SSID
-char pass[] = "<PASSWORD>"; // Your WiFi network password
-
 // Function declarations
-void setDevice_time();                                       // Function to configure the NodeMCU's time with real-time from ATS (Anedya Time Services)
-void anedya_submitData(String datapoint, float sensor_data); // Function to submit data to the Anedya server
-void anedya_submitLog(String reqID, String Log);             // Function to submit Log to the Anedya server
+void setDevice_time();                                                 // Function to configure the NodeMCU's time with real-time from ATS (Anedya Time Services)
+void anedya_submitData(String VARIABLE_IDENTIFIER, float sensor_data); // Function to submit data to the Anedya server
+void anedya_submitLog(String reqID, String Log);                       // Function to submit Log to the Anedya server
 void anedya_sendHeartbeat();
 
 // Create a DHT object
@@ -62,7 +62,7 @@ void setup()
   Serial.begin(115200); // Set the baud rate for serial communication
 
   // Connect to WiFi network
-  WiFi.begin(ssid, pass);
+  WiFi.begin(SSID, PASSWORD);
   Serial.println();
   Serial.print("[SETUP] Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
@@ -83,6 +83,7 @@ void setup()
 
 void loop()
 {
+  anedya_sendHeartbeat();
   if (!virtual_sensor)
   {
     // Read the temperature and humidity from the DHT sensor
@@ -117,7 +118,6 @@ void loop()
   Serial.println(humidity);
   anedya_submitData("humidity", humidity); // submit data to the Anedya
 
-  anedya_sendHeartbeat();
   delay(5000);
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
@@ -126,7 +126,7 @@ void loop()
 void setDevice_time()
 {
   // URL to fetch real-time from Anedya server
-  String time_url = "https://device." + regionCode + ".anedya.io/v1/time";
+  String time_url = "https://device." + REGION_CODE + ".anedya.io/v1/time";
 
   // Attempt to synchronize time with Anedya server
   Serial.println("Time synchronizing......");
@@ -185,7 +185,7 @@ void setDevice_time()
 
 // Function to submit Log to Anedya server
 // For more info, visit [https://docs.anedya.io/devicehttpapi/submitdata/]
-void anedya_submitData(String datapoint, float sensor_data)
+void anedya_submitData(String VARIABLE_IDENTIFIER, float sensor_data)
 {
   if (WiFi.status() == WL_CONNECTED)
   {                          // Check if the device is connected to WiFi
@@ -194,7 +194,7 @@ void anedya_submitData(String datapoint, float sensor_data)
     client.setInsecure();    // Configure the client to accept insecure connections
 
     // Construct the URL for submitting data to Anedya server
-    String senddata_url = "https://device." + regionCode + ".anedya.io/v1/submitData";
+    String senddata_url = "https://device." + REGION_CODE + ".anedya.io/v1/submitData";
 
     // Get current time and convert it to milliseconds
     long long current_time = now();                     // Get the current time from the device
@@ -207,7 +207,7 @@ void anedya_submitData(String datapoint, float sensor_data)
     http.addHeader("Authorization", CONNECTION_KEY);    // Add the connection key for authorization
 
     // Construct the JSON payload with sensor data and timestamp
-    String jsonStr = "{\"data\":[{\"variable\": \"" + datapoint + "\",\"value\":" + String(sensor_data) + ",\"timestamp\":" + String(current_time_milli) + "}]}";
+    String jsonStr = "{\"data\":[{\"variable\": \"" + VARIABLE_IDENTIFIER + "\",\"value\":" + String(sensor_data) + ",\"timestamp\":" + String(current_time_milli) + "}]}";
 
     // Serial.println(jsonStr);
     // Send the POST request with the JSON payload to Anedya server
@@ -258,7 +258,7 @@ void anedya_submitLog(String reqID, String Log)
     client.setInsecure();    // Configure the client to accept insecure connections
 
     // Construct the URL for submitting log to Anedya
-    String sendLogs_url = "https://device." + regionCode + ".anedya.io/v1/logs/submitLogs";
+    String sendLogs_url = "https://device." + REGION_CODE + ".anedya.io/v1/logs/submitLogs";
 
     // Get current time and convert it to milliseconds
     long long current_time = now();                     // Get the current time from the device
@@ -317,10 +317,10 @@ void anedya_sendHeartbeat()
 {
   if (WiFi.status() == WL_CONNECTED)
   {
-    WiFiClientSecure client;                                                           // Initialize a secure WiFi client
-    HTTPClient http;                                                                   // Initialize an HTTP client
-    client.setInsecure();                                                              // Configure the client to accept insecure connections                                                                  // Creating an instance of HTTPClient
-    String heartbeat_url = "https://device." + regionCode + ".anedya.io/v1/heartbeat"; // Constructing the URL for submitting data
+    WiFiClientSecure client;                                                            // Initialize a secure WiFi client
+    HTTPClient http;                                                                    // Initialize an HTTP client
+    client.setInsecure();                                                               // Configure the client to accept insecure connections                                                                  // Creating an instance of HTTPClient
+    String heartbeat_url = "https://device." + REGION_CODE + ".anedya.io/v1/heartbeat"; // Constructing the URL for submitting data
 
     // Preparing data payload in JSON format
     http.begin(client, heartbeat_url);                  // Beginning an HTTP request to the specified URL
