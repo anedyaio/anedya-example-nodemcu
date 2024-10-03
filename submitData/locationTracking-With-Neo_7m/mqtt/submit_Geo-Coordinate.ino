@@ -33,11 +33,12 @@ unsigned int gpsLocationSubmission_interval = 2000; // time in second
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
 
-String regionCode = "ap-in-1";                 // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
-const char *PHYSICAL_DEVICE_ID = "PHYSICAL-DEVICE-UUID"; // Fill your device Id , that you can get from your node description
-const char *CONNECTION_KEY = "CONNECTION-KEY";  // Fill your connection key, that you can get from your node description
-const char *ssid = "SSID";
-const char *pass = "PASSWORD";
+// ----------------------------- Anedya and Wifi credentials --------------------------------------------
+String REGION_CODE = "ap-in-1";                                          // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
+const char *CONNECTION_KEY = "";         // Fill your connection key, that you can get from your node description
+const char *PHYSICAL_DEVICE_ID = ""; // Fill your device Id , that you can get from your node description
+const char *SSID = "";
+const char *PASSWORD = "";
 
 //---------------------------------------------------------GPS --------------------------------------------------------------------------------------------
 static const int RXPin = 5, TXPin = 4; // D1,D2(yellowWire)
@@ -45,11 +46,11 @@ static const uint32_t GPSBaud = 9600;
 double latitude, longitude;
 
 // ------------------------------------------MQTT connection settings---------------------------------------------------------------------------------------
-String str_broker = "mqtt." + String(regionCode) + ".anedya.io";
-const char *mqtt_broker = str_broker.c_str();                              // MQTT broker address
+String str_broker = "mqtt." + String(REGION_CODE) + ".anedya.io";
+const char *mqtt_broker = str_broker.c_str();                                        // MQTT broker address
 const char *mqtt_username = PHYSICAL_DEVICE_ID;                                      // MQTT username
-const char *mqtt_password = CONNECTION_KEY;                                 // MQTT password
-const int mqtt_port = 8883;                                                // MQTT port
+const char *mqtt_password = CONNECTION_KEY;                                          // MQTT password
+const int mqtt_port = 8883;                                                          // MQTT port
 String responseTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/response"; // MQTT topic for device responses
 String errorTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/errors";      // MQTT topic for device errors
 
@@ -81,7 +82,7 @@ void setup()
   delay(150); // Delay for 1.5 seconds
 
   // Connect to WiFi network
-  WiFi.begin(ssid, pass);
+  WiFi.begin(SSID, PASSWORD);
   Serial.println();
   Serial.print("Connecting to WiFi...");
   while (WiFi.status() != WL_CONNECTED)
@@ -102,9 +103,6 @@ void setup()
   mqtt_client.setKeepAlive(60);                  // Set the keep alive interval (in seconds) for the MQTT connection to maintain connectivity
   mqtt_client.setCallback(mqttCallback);         // Set the callback function to be invoked when MQTT messages are received
   connectToMQTT();                               // Attempt to establish a connection to the anedya broker
-
-  mqtt_client.subscribe(responseTopic.c_str()); // subscribe to get response
-  mqtt_client.subscribe(errorTopic.c_str());    // subscibe to get error
 
   setDevice_time();
 }
@@ -152,6 +150,11 @@ void loop()
     Serial.println(F("No GPS detected: check wiring."));
     delay(4000);
   }
+  if (millis() - lastSubmittedHeatbeat_timestamp > 5000)
+  {
+    anedya_sendHeartbeat();
+    lastSubmittedHeatbeat_timestamp = millis();
+  }
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
 void connectToMQTT()
@@ -163,6 +166,8 @@ void connectToMQTT()
     if (mqtt_client.connect(client_id, mqtt_username, mqtt_password))
     {
       Serial.println("Connected to Anedya broker");
+      mqtt_client.subscribe(responseTopic.c_str()); // subscribe to get response
+      mqtt_client.subscribe(errorTopic.c_str());    // subscibe to get error
     }
     else
     {
