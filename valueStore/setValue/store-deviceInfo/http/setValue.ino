@@ -21,24 +21,25 @@
 #include <ArduinoJson.h> // Include the ArduinoJson library for JSON handling
 #include <TimeLib.h>     // Include the TimeLib library for time manipulation
 
-String regionCode = "ap-in-1"; // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/intro/#region]
-String deviceID = "<PHYSICAL-DEVICE-UUID>";
-String connectionKey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
+// ----------------------------- Anedya and Wifi credentials --------------------------------------------
+String REGION_CODE = "ap-in-1";                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
+const char *CONNECTION_KEY = "";  // Fill your connection key, that you can get from your node description
+const char *PHYSICAL_DEVICE_ID = ""; // Fill your device Id , that you can get from your node description
+const char *SSID = "";     
+const char *PASSWORD = ""; 
 
-// Your WiFi credentials
-char ssid[] = "<SSID>";  // Your WiFi network SSID
-char pass[] = "<PASSWORD>";  // Your WiFi network password
 
-long long updateInterval,timer;   //varibles to insert interval
+long long updateInterval,timer, lastSubmittedHeartbeat_timestamp;   //varibles to insert interval
 
 void anedya_setValue(String key, String type, String value);  //function declaration to set the value
+void anedya_sendHeartbeat();
 
 void setup()
 {
     Serial.begin(115200); // Set the baud rate for serial communication
 
     // Connect to WiFi network
-    WiFi.begin(ssid, pass);
+    WiFi.begin(SSID, PASSWORD);
     Serial.println();
     Serial.print("[SETUP] Connecting to WiFi");
     while (WiFi.status() != WL_CONNECTED)
@@ -50,6 +51,7 @@ void setup()
     Serial.print("Connected, IP address: ");
     Serial.println(WiFi.localIP());
     timer=millis();
+    lastSubmittedHeartbeat_timestamp=millis();
 }
 
 void loop()
@@ -70,6 +72,11 @@ String boardInfo = "Chip ID:" + String(ESP.getChipId(), HEX) +", "+
                                                  3 parameter- value.  For detailed info, visit-https://docs.anedya.io/valuestore/intro/        */
    timer=millis();                             
   }
+
+  if(millis()-lastSubmittedHeartbeat_timestamp>=5000){
+    anedya_sendHeartbeat();
+    lastSubmittedHeartbeat_timestamp=millis();
+  }
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
 void anedya_setValue(String KEY, String TYPE, String VALUE)
@@ -79,14 +86,14 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
         WiFiClientSecure client; // Initialize a secure WiFi client
         HTTPClient http;         // Initialize an HTTP client
         client.setInsecure();    // Configure the client to accept insecure connections
-    String setValue_url = "https://device." + regionCode + ".anedya.io/v1/valuestore/setValue";  // Construct the URL for submitting data
+    String setValue_url = "https://device." + REGION_CODE + ".anedya.io/v1/valuestore/setValue";  // Construct the URL for submitting data
 
         // Prepare data payload in JSON format
         http.begin(client, setValue_url);                   // Initialize the HTTP client with the Anedya server URL
         http.addHeader("Content-Type", "application/json"); // Set the content type of the request as JSON
         http.addHeader("Accept", "application/json");       // Specify the accepted content type
         http.addHeader("Auth-mode", "key");                 // Set authentication mode
-        http.addHeader("Authorization", connectionKey);     // Add the connection key for authorization
+        http.addHeader("Authorization", CONNECTION_KEY);     // Add the connection key for authorization
 
     // Construct the JSON payload
     String valueJsonStr = "{\"reqId\": \"\",\"key\":\"" + KEY + "\",\"value\": \"" + VALUE + "\",\"type\": \"" + TYPE + "\"}";
@@ -124,4 +131,58 @@ void anedya_setValue(String KEY, String TYPE, String VALUE)
     { // Error handling for WiFi connection failure
         Serial.println("Error in WiFi connection");
     }
+}
+
+//---------------------------------- Function for send heartbeat -----------------------------------
+void anedya_sendHeartbeat()
+{
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    WiFiClientSecure client; // Initialize a secure WiFi client
+    HTTPClient http;         // Initialize an HTTP client
+    client.setInsecure();    // Configure the client to accept insecure connections                                                                  // Creating an instance of HTTPClient
+    String heartbeat_url = "https://device." + REGION_CODE + ".anedya.io/v1/heartbeat"; // Constructing the URL for submitting data
+
+    // Preparing data payload in JSON format
+    http.begin( client,heartbeat_url);                           // Beginning an HTTP request to the specified URL
+    http.addHeader("Content-Type", "application/json"); // Adding a header specifying the content type as JSON
+    http.addHeader("Accept", "application/json");       // Adding a header specifying the accepted content type as JSON
+    http.addHeader("Auth-mode", "key");                 // Adding a header specifying the authentication mode as "key"
+    http.addHeader("Authorization", CONNECTION_KEY);     // Adding a header containing the authorization key
+
+    // Constructing the JSON payload with sensor data and timestamp
+    String body_payload = "{}";
+
+    // Sending the POST request with the JSON payload to Anedya server
+    int httpResponseCode = http.POST(body_payload);
+
+    // Checking if the request was successful
+    if (httpResponseCode > 0)
+    {
+      String response = http.getString(); // Getting the response from the server
+      // Parsing the JSON response
+      JsonDocument jsonSubmit_response;
+      deserializeJson(jsonSubmit_response, response); // Extracting the JSON response
+      int errorcode = jsonSubmit_response["errorcode"];
+      if (errorcode == 0) // Error code 0 indicates data submitted successfully
+      { 
+        Serial.println("Sent Heartbeat");
+      }
+      else
+      { 
+        Serial.println("Failed to send heartbeat!!");
+        Serial.println(response);  //error code4020 indicate -unknown variable identifier
+      }   
+    }                        
+    else
+    {
+      Serial.print("Error on sending POST: "); // Printing error message indicating failure to send POST request
+      Serial.println(httpResponseCode);        // Printing the HTTP response code
+    }
+    http.end(); // Ending the HTTP client session
+  }
+  else
+  {
+    Serial.println("Error in WiFi connection"); // Printing error message indicating WiFi connection failure
+  }
 }
