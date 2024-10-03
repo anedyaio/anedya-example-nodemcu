@@ -34,8 +34,8 @@ bool virtual_sensor = false;
 #include <DHT.h>              // Include the DHT library for humidity and temperature sensor handling
 
 String regionCode = "ap-in-1";                   // Anedya region code (e.g., "ap-in-1" for Asia-Pacific/India) | For other country code, visity [https://docs.anedya.io/device/#region]
-const char *deviceID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
-const char *connectionkey = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
+const char *PHYSICAL_DEVICE_ID = "<PHYSICAL-DEVICE-UUID>"; // Fill your device Id , that you can get from your node description
+const char *CONNECTION_KEY = "<CONNECTION-KEY>";  // Fill your connection key, that you can get from your node description
 // WiFi credentials
 const char *ssid = "<SSID>";     // Replace with your WiFi name
 const char *pass = "<PASSWORD>"; // Replace with your WiFi password
@@ -43,11 +43,11 @@ const char *pass = "<PASSWORD>"; // Replace with your WiFi password
 // MQTT connection settings
 String str_broker="mqtt."+String(regionCode)+".anedya.io";
 const char *mqtt_broker = str_broker.c_str();                              // MQTT broker address
-const char *mqtt_username = deviceID;                                      // MQTT username
-const char *mqtt_password = connectionkey;                                 // MQTT password
+const char *mqtt_username = PHYSICAL_DEVICE_ID;                                      // MQTT username
+const char *mqtt_password = CONNECTION_KEY;                                 // MQTT password
 const int mqtt_port = 8883;                                                // MQTT port
-String responseTopic = "$anedya/device/" + String(deviceID) + "/response"; // MQTT topic for device responses
-String errorTopic = "$anedya/device/" + String(deviceID) + "/errors";      // MQTT topic for device errors
+String responseTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/response"; // MQTT topic for device responses
+String errorTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/errors";      // MQTT topic for device errors
 
 long long submitDataTimer, submitLogTimer; // timer to handle request delay
 String timeRes, submitRes;                 // varibale to handle response
@@ -65,6 +65,8 @@ void mqttCallback(char *topic, byte *payload, unsigned int length); // funstio t
 void setDevice_time();                                              // Function to configure the device time with real-time from ATS (Anedya Time Services)
 void anedya_submitData(String datapoint, float sensor_data);        // Function to submit data to the Anedya server
 void anedya_sumitLog(String reqID, String Log);
+
+void anedya_sendHeartbeat();
 
 // WiFi and MQTT client initialization
 WiFiClientSecure esp_client;
@@ -146,6 +148,8 @@ void loop()
   anedya_submitData("humidity", humidity); // submit data to the Anedya
 
   Serial.println("-------------------------------------------------");
+
+  anedya_sendHeartbeat();
   delay(5000);
 }
 //<---------------------------------------------------------------------------------------------------------------------------->
@@ -153,7 +157,7 @@ void connectToMQTT()
 {
   while (!mqtt_client.connected())
   {
-    const char *client_id = deviceID;
+    const char *client_id = PHYSICAL_DEVICE_ID;
     Serial.print("Connecting to Anedya Broker....... ");
     if (mqtt_client.connect(client_id, mqtt_username, mqtt_password))
     {
@@ -195,7 +199,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 // For more info, visit [https://docs.anedya.io/device/api/http-time-sync/]
 void setDevice_time()
 {
-  String timeTopic = "$anedya/device/" + String(deviceID) + "/time/json";
+  String timeTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/time/json";
   const char *mqtt_topic = timeTopic.c_str();
   // Attempt to synchronize time with Anedya server
   if (mqtt_client.connected())
@@ -264,7 +268,7 @@ void anedya_submitData(String datapoint, float sensor_data)
 {
   boolean check = true;
 
-  String strSubmitTopic = "$anedya/device/" + String(deviceID) + "/submitdata/json";
+  String strSubmitTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/submitdata/json";
   const char *submitTopic = strSubmitTopic.c_str();
   while (check)
   {
@@ -323,7 +327,7 @@ void anedya_submitLog(String reqID, String Log)
 {
   boolean check = true;
 
-  String strSubmitTopic = "$anedya/device/" + String(deviceID) + "/logs/submitLogs/json";
+  String strSubmitTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/logs/submitLogs/json";
   const char *submitTopic = strSubmitTopic.c_str();
   while (check)
   {
@@ -369,4 +373,17 @@ void anedya_submitLog(String reqID, String Log)
       connectToMQTT();
     } // mqtt connect check end
   }
+}
+
+void anedya_sendHeartbeat()
+{
+  mqtt_client.connected() ? (void)0 : connectToMQTT();
+
+  String strHeartbeatTopic = "$anedya/device/" + String(PHYSICAL_DEVICE_ID) + "/heartbeat/json";
+  const char *heartbeatTopic = strHeartbeatTopic.c_str();
+
+  String strPayload = "{}";
+  const char *Payload = strPayload.c_str();
+  mqtt_client.publish(heartbeatTopic, Payload);
+  mqtt_client.loop();
 }
