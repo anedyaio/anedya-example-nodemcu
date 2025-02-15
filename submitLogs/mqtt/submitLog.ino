@@ -296,7 +296,7 @@ void anedya_submitData(String VARIABLE_IDENTIFIER, float sensor_data)
         DynamicJsonDocument jsonResponse(100);    // Declare a JSON document with a capacity of 200 bytes
         deserializeJson(jsonResponse, submitRes); // Deserialize the JSON response from the server into the JSON document
 
-        int errorCode = jsonResponse["errCode"]; // Get the server receive time from the JSON document
+        int errorCode = jsonResponse["errorcode"]; // Get the server receive time from the JSON document
         if (errorCode == 0)
         {
           Serial.println("Data pushed to Anedya!!");
@@ -354,7 +354,7 @@ void anedya_submitLog(String reqID, String Log)
         // Parse the JSON response
         DynamicJsonDocument jsonResponse(100);    // Declare a JSON document with a capacity of 200 bytes
         deserializeJson(jsonResponse, submitRes); // Deserialize the JSON response from the server into the JSON document
-        int errorCode = jsonResponse["errCode"];  // Get the server receive time from the JSON document
+        int errorCode = jsonResponse["errorcode"];  // Get the server receive time from the JSON document
         if (errorCode == 0)
         {
           Serial.println("Log pushed to Anedya!!");
