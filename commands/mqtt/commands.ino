@@ -196,7 +196,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
       Serial.println("Unknown Device");
     }
   }
-  else if (String(Response["errCode"]) == "0")
+  else if (String(Response["errorcode"]) == "0")
   {
   }
   else // block to debug errors
