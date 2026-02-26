@@ -2,7 +2,7 @@
 
 # Room Monitoring - NodeMCU+DHT (mqtt)
 
-This Arduino sketch allows you to connect your device to a WiFi network and send data to a server. It fetches the server time and sends data to the anedya.
+This Arduino sketch allows you to connect your device to a WiFi network, sync device time and send data to Anedya.
 
 > [!WARNING]
 > This code is for hobbyists for learning purposes. Not recommended for production use!!
@@ -59,19 +59,6 @@ This repository contains the ArduinoJson library, which provides efficient JSON 
 4. Click on the ArduinoJson entry in the list.
 5. Click the "Install" button to install the library.
 6. Once installed, you can include the library in your Arduino sketches by adding `#include <ArduinoJson.h>` at the top of your sketch.
-
-### Timelib
-
-The `timelib.h` library provides functionality for handling time-related operations in Arduino sketches. It allows you to work with time and date, enabling you to synchronize events, schedule tasks, and perform time-based calculations.
-
-To include the `timelib.h` library:
-
-1. Open the Arduino IDE.
-2. Go to `Sketch > Include Library > Manage Libraries...`.
-3. In the Library Manager, search for "Time".
-4. Click on the ArduinoJson entry in the list(`Time by Michael Margolis`).
-5. Click the "Install" button to install the library.
-6. Once installed, you can include the library in your Arduino sketches by adding `#include <TimeLib.h>` at the top of your sketch.
 
 ### PubSubClient
 
